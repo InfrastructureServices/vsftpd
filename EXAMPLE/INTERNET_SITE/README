@@ -41,13 +41,13 @@ no_access               = 192.168.1.3
 As an example of how to ban certain sites from connecting, 192.168.1.3 will
 be denied access.
 
-banner_fail             = /etc/vsftpd.busy_banner
+banner_fail             = /etc/vsftpd/busy_banner
 
 This is the file to display to users if the connection is refused for whatever
 reason (too many users, IP banned).
 
 Example of how to populate it:
-echo "421 Server busy, please try later." > /etc/vsftpd.busy_banner
+echo "421 Server busy, please try later." > /etc/vsftpd/busy_banner
 
 log_on_success          += PID HOST DURATION
 log_on_failure          += HOST
@@ -62,7 +62,7 @@ Step 2) Set up your vsftpd configuration file.
 
 An example file is supplied. Install it like this:
 
-cp vsftpd.conf /etc
+cp vsftpd.conf /etc/vsftpd
 
 Let's example the contents of the file:
 

@@ -17,7 +17,7 @@ even per-connect-IP configurability.
 
 To use this example config:
 
-1) Copy the vsftpd.conf file in this directory to /etc/vsftpd.conf.
+1) Copy the vsftpd.conf file in this directory to /etc/vsftpd/vsftpd.conf.
 
 2) Start up vsftpd, e.g.
 vsftpd &
@@ -51,5 +51,5 @@ in the vsftpd.conf:
 listen_address=192.168.1.2
 
 And launch vsftpd with a specific config file like this:
-vsftpd /etc/vsftpd.conf.site1 &
+vsftpd /etc/vsftpd/vsftpd.conf.site1 &
 

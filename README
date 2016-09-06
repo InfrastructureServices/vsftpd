@@ -37,3 +37,8 @@ All configuration options are documented in the manual page vsftpd.conf.5.
 Various example configurations are discussed in the EXAMPLE directory.
 Frequently asked questions are tackled in the FAQ file.
 
+Important Note
+==============
+The location of configuration files was changed to /etc/vsftpd/. If you want
+to migrate your old conf files from /etc (files vsftpd.xxxx.rpmsave) use
+/etc/vsfptd/vsftpd_conf_migrate.sh

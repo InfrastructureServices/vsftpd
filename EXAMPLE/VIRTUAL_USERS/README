@@ -15,7 +15,7 @@ See example file "logins.txt" - this specifies "tom" with password "foo" and
 "fred" with password "bar".
 Whilst logged in as root, create the actual database file like this:
 
-db_load -T -t hash -f logins.txt /etc/vsftpd_login.db
+db_load -T -t hash -f logins.txt /etc/vsftpd/login.db
 (Requires the Berkeley db program installed).
 NOTE: Many systems have multiple versions of "db" installed, so you may
 need to use e.g. db3_load for correct operation. This is known to affect
@@ -23,10 +23,10 @@ some Debian systems. The core issue is that pam_userdb expects its login
 database to be a specific db version (often db3, whereas db4 may be installed
 on your system).
 
-This will create /etc/vsftpd_login.db. Obviously, you may want to make sure
+This will create /etc/vsftpd/login.db. Obviously, you may want to make sure
 the permissions are restricted:
 
-chmod 600 /etc/vsftpd_login.db
+chmod 600 /etc/vsftpd/login.db
 
 For more information on maintaing your login database, look around for
 documentation on "Berkeley DB", e.g.
@@ -37,8 +37,8 @@ Step 2) Create a PAM file which uses your new database.
 
 See the example file vsftpd.pam. It contains two lines:
 
-auth required /lib/security/pam_userdb.so db=/etc/vsftpd_login
-account required /lib/security/pam_userdb.so db=/etc/vsftpd_login
+auth required /lib/security/pam_userdb.so db=/etc/vsftpd/login
+account required /lib/security/pam_userdb.so db=/etc/vsftpd/login
 
 This tells PAM to authenticate users using our new database. Copy this PAM
 file to the PAM directory - typically /etc/pam.d/
@@ -108,9 +108,9 @@ pasv_max_port=30999
 These put a port range on passive FTP incoming requests - very useful if
 you are configuring a firewall.
 
-Copy the example vsftpd.conf file to /etc:
+Copy the example vsftpd.conf file to /etc/vsftpd:
 
-cp vsftpd.conf /etc/
+cp vsftpd.conf /etc/vsftpd/
 
 
 Step 5) Start up vsftpd.

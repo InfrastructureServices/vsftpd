@@ -21,7 +21,7 @@ itself will listen on the network. This latter mode is easier to use, and
 recommended. It is activated by setting
 .Pa listen=YES
 in
-.Pa /etc/vsftpd.conf .
+.Pa /etc/vsftpd/vsftpd.conf .
 Direct execution of the
 .Nm vsftpd
 binary will then launch the FTP service ready for immediate client connections.
@@ -33,7 +33,7 @@ as root. Any command line option not starting with a "-" character is treated
 as a config file that will be loaded. Note that config files are loaded in the
 strict order that they are encountered on the command line.
 If no config files are specified, the default configuration file of
-.Pa /etc/vsftpd.conf
+.Pa /etc/vsftpd/vsftpd.conf
 will be loaded, after all other command line options are processed.
 .Pp
 Supported options are:
@@ -47,14 +47,14 @@ their appearance on the command line, including intermingling with loading of
 config files.
 .El
 .Sh EXAMPLES
-vsftpd -olisten=NO /etc/vsftpd.conf -oftpd_banner=blah
+vsftpd -olisten=NO /etc/vsftpd/vsftpd.conf -oftpd_banner=blah
 .Pp
 That example overrides vsftpd's built-in default for the "listen" option to be
-NO, but then loads /etc/vsftpd.conf which may override that setting. Finally,
+NO, but then loads /etc/vsftpd/vsftpd.conf which may override that setting. Finally,
 the "ftpd_banner" setting is set to "blah", which overrides any default vsftpd
 setting and any identical setting that was in the config file.
 .Sh FILES
-.Pa /etc/vsftpd.conf
+.Pa /etc/vsftpd/vsftpd.conf
 .Sh SEE ALSO
 .Xr vsftpd.conf 5
 .end

@@ -1,7 +1,7 @@
 #ifndef VSF_DEFS_H
 #define VSF_DEFS_H
 
-#define VSFTP_DEFAULT_CONFIG    "/etc/vsftpd.conf"
+#define VSFTP_DEFAULT_CONFIG    "/etc/vsftpd/vsftpd.conf"
 
 #define VSFTP_COMMAND_FD        0
 

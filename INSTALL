@@ -56,14 +56,14 @@ cp vsftpd.8 /usr/local/man/man8
 
 "make install" doesn't copy the sample config file. It is recommended you
 do this:
-cp vsftpd.conf /etc
+cp vsftpd.conf /etc/vsftpd
 
 Step 4) Smoke test (without an inetd).
 
 vsftpd can run standalone or via an inetd (such as inetd or xinetd). You will
 typically get more control running vsftpd from an inetd. But first we will run
 it without, so we can check things are going well so far.
-Edit /etc/vsftpd.conf, and add this line at the bottom:
+Edit /etc/vsftpd/vsftpd.conf, and add this line at the bottom:
 
 listen=YES
 
@@ -135,11 +135,11 @@ cp RedHat/vsftpd.pam /etc/pam.d/ftp
 Step 7) Customize your configuration
 
 As well as the above three pre-requisites, you are recommended to install a
-config file. The default location for the config file is /etc/vsftpd.conf.
+config file. The default location for the config file is /etc/vsftpd/vsftpd.conf.
 There is a sample vsftpd.conf in the distribution tarball. You probably want
-to copy that to /etc/vsftpd.conf as a basis for modification, i.e.:
+to copy that to /etc/vsftpd/vsftpd.conf as a basis for modification, i.e.:
 
-cp vsftpd.conf /etc
+cp vsftpd.conf /etc/vsftpd
 
 The default configuration allows neither local user logins nor anonymous
 uploads. You may wish to change these defaults.
