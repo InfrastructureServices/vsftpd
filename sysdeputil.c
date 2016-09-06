@@ -16,6 +16,10 @@
 #include "tunables.h"
 #include "builddefs.h"
 
+/* For gethostbyaddr, inet_addr */
+#include <netdb.h>
+#include <arpa/inet.h>
+
 /* For Linux, this adds nothing :-) */
 #include "port/porting_junk.h"
 
@@ -323,6 +327,10 @@ vsf_sysdep_check_auth(struct mystr* p_user_str,
                       const struct mystr* p_remote_host)
 {
   int retval = -1;
+#ifdef PAM_RHOST
+  struct sockaddr_in sin;
+  struct hostent *host;
+#endif
   pam_item_t item;
   const char* pam_user_name = 0;
   struct pam_conv the_conv =
@@ -346,7 +354,12 @@ vsf_sysdep_check_auth(struct mystr* p_user_str,
     return 0;
   }
 #ifdef PAM_RHOST
-  retval = pam_set_item(s_pamh, PAM_RHOST, str_getbuf(p_remote_host));
+  sin.sin_addr.s_addr = inet_addr(str_getbuf(p_remote_host));
+  host = gethostbyaddr((char*)&sin.sin_addr.s_addr,sizeof(struct in_addr),AF_INET);
+  if (host != (struct hostent*)0)
+    retval = pam_set_item(s_pamh, PAM_RHOST, host->h_name);
+  else
+    retval = pam_set_item(s_pamh, PAM_RHOST, str_getbuf(p_remote_host));
   if (retval != PAM_SUCCESS)
   {
     (void) pam_end(s_pamh, retval);
@@ -559,7 +572,7 @@ vsf_sysdep_has_capabilities(void)
   }
   return s_runtime_has_caps;
 }
-  
+
   #ifndef VSF_SYSDEP_HAVE_LIBCAP
 static int
 do_checkcap(void)
@@ -1081,7 +1094,7 @@ vsf_sysutil_recv_fd(const int sock_fd)
   msg.msg_flags = 0;
   /* In case something goes wrong, set the fd to -1 before the syscall */
   p_fd = (int*)CMSG_DATA(CMSG_FIRSTHDR(&msg));
-  *p_fd = -1;  
+  *p_fd = -1;
   retval = recvmsg(sock_fd, &msg, 0);
   if (retval != 1)
   {
