@@ -103,6 +103,13 @@ vsf_log_line(struct vsf_session* p_sess, enum EVSFLogEntryType what,
   vsf_log_common(p_sess, 1, what, p_str);
 }
 
+void
+vsf_log_failed_line(struct vsf_session* p_sess, enum EVSFLogEntryType what,
+             struct mystr* p_str)
+{
+  vsf_log_common(p_sess, 0, what, p_str);
+}
+
 int
 vsf_log_entry_pending(struct vsf_session* p_sess)
 {

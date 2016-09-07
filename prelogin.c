@@ -246,6 +246,20 @@ handle_user_command(struct vsf_session* p_sess)
       check_login_delay();
       vsf_cmdio_write(p_sess, FTP_LOGINERR, "Permission denied.");
       check_login_fails(p_sess);
+      if (tunable_userlist_log)
+      {
+        struct mystr str_log_line = INIT_MYSTR;
+        if (tunable_userlist_deny)
+        {
+          str_alloc_text(&str_log_line, "User is in the deny user list.");
+        }
+        else
+        {
+          str_alloc_text(&str_log_line, "User is not in the allow user list.");
+        }
+        vsf_log_failed_line(p_sess, kVSFLogEntryLogin, &str_log_line);
+        str_free(&str_log_line);
+      }
       str_empty(&p_sess->user_str);
       return;
     }

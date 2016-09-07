@@ -588,6 +588,14 @@ Self-signed certs do not constitute OK validation. (New in v2.0.6).
 
 Default: NO
 .TP
+.B userlist_log
+This option is examined if
+.BR userlist_enable
+is activated. If enabled, every login denial based on the user list will be
+logged.
+
+Default: NO
+.TP
 .B virtual_use_local_privs
 If enabled, virtual users will use the same privileges as local users. By
 default, virtual users will use the same privileges as anonymous users, which
