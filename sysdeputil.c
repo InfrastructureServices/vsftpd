@@ -1306,7 +1306,7 @@ vsf_sysutil_fork_isolate_failok()
   static int cloneflags_work = 1;
   if (cloneflags_work)
   {
-    int ret = syscall(__NR_clone, CLONE_NEWPID | CLONE_NEWIPC | SIGCHLD, NULL);
+    int ret = clone(NULL, NULL, CLONE_NEWPID | CLONE_NEWIPC | SIGCHLD, NULL);
     if (ret != -1 || (errno != EINVAL && errno != EPERM))
     {
       if (ret == 0)
@@ -1328,7 +1328,7 @@ vsf_sysutil_fork_newnet()
   static int cloneflags_work = 1;
   if (cloneflags_work)
   {
-    int ret = syscall(__NR_clone, CLONE_NEWNET | SIGCHLD, NULL);
+    int ret = clone(NULL, NULL, CLONE_NEWNET | SIGCHLD, NULL);
     if (ret != -1 || (errno != EINVAL && errno != EPERM))
     {
       if (ret == 0)
