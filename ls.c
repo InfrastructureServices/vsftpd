@@ -311,6 +311,20 @@ vsf_filename_passes_filter(const struct mystr* p_filename_str,
       {
         goto out;
       }
+      if (!must_match_at_current_pos && last_token == 0)
+      {
+        struct mystr last_str = INIT_MYSTR;
+        str_mid_to_end(&name_remain_str, &last_str,
+          str_getlen(&name_remain_str) - str_getlen(&s_match_needed_str));
+        locate_result = str_locate_str(&last_str, &s_match_needed_str);
+        str_free(&last_str);
+
+        if (locate_result.found)
+        {
+          ret = 1;
+        }
+        goto out;
+      }
       /* Chop matched string out of remainder */
       str_mid_to_end(&name_remain_str, &temp_str,
                      indexx + str_getlen(&s_match_needed_str));
