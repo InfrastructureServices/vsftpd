@@ -104,6 +104,18 @@ str_strdup(const struct mystr* p_str)
   return vsf_sysutil_strdup(str_getbuf(p_str));
 }
 
+const char*
+str_strdup_trimmed(const struct mystr* p_str)
+{
+  const char* p_trimmed = str_getbuf(p_str);
+  int h, t, newlen;
+
+  for (h = 0; h < (int)str_getlen(p_str) && vsf_sysutil_isspace(p_trimmed[h]); h++) ;
+  for (t = str_getlen(p_str) - 1; t >= 0 && vsf_sysutil_isspace(p_trimmed[t]); t--) ;
+  newlen = t - h + 1;
+  return newlen ? vsf_sysutil_strndup(p_trimmed+h, (unsigned int)newlen) : 0L;
+}
+
 void
 str_alloc_alt_term(struct mystr* p_str, const char* p_src, char term)
 {

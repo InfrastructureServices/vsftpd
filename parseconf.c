@@ -280,7 +280,7 @@ vsf_parseconf_load_setting(const char* p_setting, int errs_fatal)
         }
         else
         {
-          *p_curr_setting = str_strdup(&s_value_str);
+          *p_curr_setting = str_strdup_trimmed(&s_value_str);
         }
         return;
       }

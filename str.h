@@ -31,6 +31,7 @@ void str_alloc_ulong(struct mystr* p_str, unsigned long the_ulong);
 void str_alloc_filesize_t(struct mystr* p_str, filesize_t the_filesize);
 void str_copy(struct mystr* p_dest, const struct mystr* p_src);
 const char* str_strdup(const struct mystr* p_str);
+const char* str_strdup_trimmed(const struct mystr* p_str);
 void str_empty(struct mystr* p_str);
 void str_free(struct mystr* p_str);
 void str_trunc(struct mystr* p_str, unsigned int trunc_len);

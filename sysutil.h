@@ -186,6 +186,7 @@ int vsf_sysutil_wait_get_exitcode(
 /* Various string functions */
 unsigned int vsf_sysutil_strlen(const char* p_text);
 char* vsf_sysutil_strdup(const char* p_str);
+char* vsf_sysutil_strndup(const char* p_str, unsigned int p_len);
 void vsf_sysutil_memclr(void* p_dest, unsigned int size);
 void vsf_sysutil_memcpy(void* p_dest, const void* p_src,
                         const unsigned int size);
