@@ -26,6 +26,8 @@ static unsigned int s_ipaddr_size;
 
 static void handle_sigchld(void*  duff);
 static void handle_sighup(void*  duff);
+static void handle_sigusr1(int sig);
+static void handle_sigalrm(int sig);
 static void prepare_child(int sockfd);
 static unsigned int handle_ip_count(void* p_raw_addr);
 static void drop_ip_count(void* p_raw_addr);
@@ -46,11 +48,23 @@ vsf_standalone_main(void)
   }
   if (tunable_background)
   {
+    vsf_sysutil_sigaction(kVSFSysUtilSigALRM, handle_sigalrm);
+    vsf_sysutil_sigaction(kVSFSysUtilSigUSR1, handle_sigusr1);
+
     int forkret = vsf_sysutil_fork();
     if (forkret > 0)
     {
       /* Parent, just exit */
-      vsf_sysutil_exit(0);
+      vsf_sysutil_set_alarm(3);
+      vsf_sysutil_pause();
+
+      vsf_sysutil_exit(1);
+    }
+    else if (forkret == 0)
+    {
+      // Son, restore original signal handler
+      vsf_sysutil_sigaction(kVSFSysUtilSigALRM, 0L);
+      vsf_sysutil_sigaction(kVSFSysUtilSigUSR1, 0L);
     }
     /* Son, close standard FDs to avoid SSH hang-on-exit */
     vsf_sysutil_reopen_standard_fds();
@@ -99,6 +113,10 @@ vsf_standalone_main(void)
     {
       die("could not bind listening IPv4 socket");
     }
+    if (tunable_background)
+    {
+      vsf_sysutil_kill(vsf_sysutil_getppid(), kVSFSysUtilSigUSR1);
+    }
   }
   else
   {
@@ -128,6 +146,10 @@ vsf_standalone_main(void)
     if (vsf_sysutil_retval_is_error(retval))
     {
       die("could not bind listening IPv6 socket");
+    }
+    if (tunable_background)
+    {
+      vsf_sysutil_kill(vsf_sysutil_getppid(), kVSFSysUtilSigUSR1);
     }
   }
   vsf_sysutil_close(0);
@@ -266,6 +288,20 @@ handle_sighup(void* duff)
   /* We don't crash the out the listener if an invalid config was added */
   tunables_load_defaults();
   vsf_parseconf_load_file(0, 0);
+}
+
+static void
+handle_sigalrm(int sig)
+{
+  (void)sig; // avoid unused parameter error
+  vsf_sysutil_exit(1);
+}
+
+static void
+handle_sigusr1(int sig)
+{
+  (void)sig; // avoid unused parameter error
+  vsf_sysutil_exit(0);
 }
 
 static unsigned int

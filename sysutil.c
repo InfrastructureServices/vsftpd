@@ -201,6 +201,9 @@ vsf_sysutil_translate_sig(const enum EVSFSysUtilSignal sig)
     case kVSFSysUtilSigHUP:
       realsig = SIGHUP;
       break;
+    case kVSFSysUtilSigUSR1:
+      realsig = SIGUSR1;
+      break;
     default:
       bug("unknown signal in vsf_sysutil_translate_sig");
       break;
@@ -547,6 +550,12 @@ vsf_sysutil_getpid(void)
     s_current_pid = vsf_sysutil_getpid_nocache();
   }
   return (unsigned int) s_current_pid;
+}
+
+unsigned int
+vsf_sysutil_getppid(void)
+{
+  return (unsigned int)getppid();
 }
 
 int
@@ -2870,4 +2879,54 @@ vsf_sysutil_post_fork()
   {
     s_sig_details[i].pending = 0;
   }
+}
+
+static struct sigaction sigalr, sigusr1;
+
+void
+vsf_sysutil_sigaction(const enum EVSFSysUtilSignal sig, void (*p_handlefunc)(int))
+{
+  int realsig = vsf_sysutil_translate_sig(sig);
+  int retval;
+  struct sigaction sigact, *origsigact=NULL;
+  if (realsig==SIGALRM)
+  {
+    origsigact = &sigalr;
+  }
+  else if (realsig==SIGUSR1)
+  {
+    origsigact = &sigusr1;
+  }
+  vsf_sysutil_memclr(&sigact, sizeof(sigact));
+  if (p_handlefunc != NULL)
+  {
+    sigact.sa_handler = p_handlefunc;
+    retval = sigfillset(&sigact.sa_mask);
+    if (retval != 0)
+    {
+      die("sigfillset");
+    }
+    retval = sigaction(realsig, &sigact, origsigact);
+  }
+  else
+  {
+    retval = sigaction(realsig, origsigact, NULL);
+  }
+  if (retval != 0)
+  {
+    die("sigaction");
+  }
+}
+
+int
+vsf_sysutil_kill(int pid, int sig)
+{
+  int realsig = vsf_sysutil_translate_sig(sig);
+  return kill(pid, realsig);
+}
+
+int
+vsf_sysutil_pause()
+{
+  return pause();
 }

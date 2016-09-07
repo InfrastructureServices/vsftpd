@@ -30,7 +30,8 @@ enum EVSFSysUtilSignal
   kVSFSysUtilSigCHLD,
   kVSFSysUtilSigPIPE,
   kVSFSysUtilSigURG,
-  kVSFSysUtilSigHUP
+  kVSFSysUtilSigHUP,
+  kVSFSysUtilSigUSR1
 };
 enum EVSFSysUtilInterruptContext
 {
@@ -165,6 +166,7 @@ void vsf_sysutil_free(void* p_ptr);
 
 /* Process creation/exit/process handling */
 unsigned int vsf_sysutil_getpid(void);
+unsigned int vsf_sysutil_getppid(void);
 void vsf_sysutil_post_fork(void);
 int vsf_sysutil_fork(void);
 int vsf_sysutil_fork_failok(void);
@@ -182,6 +184,9 @@ int vsf_sysutil_wait_exited_normally(
   const struct vsf_sysutil_wait_retval* p_waitret);
 int vsf_sysutil_wait_get_exitcode(
   const struct vsf_sysutil_wait_retval* p_waitret);
+void vsf_sysutil_sigaction(const enum EVSFSysUtilSignal sig, void (*p_handlefunc)(int));
+int vsf_sysutil_kill(int pid, int sig);
+int vsf_sysutil_pause();
 
 /* Various string functions */
 unsigned int vsf_sysutil_strlen(const char* p_text);
