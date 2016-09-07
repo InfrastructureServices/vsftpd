@@ -246,8 +246,30 @@ vsf_filename_passes_filter(const struct mystr* p_filename_str,
   int ret = 0;
   char last_token = 0;
   int must_match_at_current_pos = 1;
+
+
   str_copy(&filter_remain_str, p_filter_str);
-  str_copy(&name_remain_str, p_filename_str);
+
+  if (!str_isempty (&filter_remain_str) && !str_isempty(p_filename_str)) {
+    if (str_get_char_at(p_filter_str, 0) == '/') {
+      if (str_get_char_at(p_filename_str, 0) != '/') {
+        str_getcwd (&name_remain_str);
+
+        if (str_getlen(&name_remain_str) > 1) /* cwd != root dir */
+          str_append_char (&name_remain_str, '/');
+
+        str_append_str (&name_remain_str, p_filename_str);
+      }
+      else
+       str_copy (&name_remain_str, p_filename_str);
+    } else {
+      if (str_get_char_at(p_filter_str, 0) != '{')
+        str_basename (&name_remain_str, p_filename_str);
+      else
+        str_copy (&name_remain_str, p_filename_str);
+    }
+  } else
+    str_copy(&name_remain_str, p_filename_str);
 
   while (!str_isempty(&filter_remain_str) && *iters < VSFTP_MATCHITERS_MAX)
   {

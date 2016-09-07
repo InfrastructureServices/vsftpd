@@ -711,3 +711,14 @@ str_replace_unprintable(struct mystr* p_str, char new_char)
   }
 }
 
+void
+str_basename (struct mystr* d_str, const struct mystr* path)
+{
+  static struct mystr tmp;
+
+  str_copy (&tmp, path);
+  str_split_char_reverse(&tmp, d_str, '/');
+
+  if (str_isempty(d_str))
+   str_copy (d_str, path);
+}
