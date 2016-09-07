@@ -297,8 +297,9 @@ Default: NO
 .TP
 .B listen_ipv6
 Like the listen parameter, except vsftpd will listen on an IPv6 socket instead
-of an IPv4 one. This parameter and the listen parameter are mutually
-exclusive.
+of an IPv4 one. Note that a socket listening on the IPv6 "any" address (::)
+will accept both IPv6 and IPv4 connections by default. This parameter and the
+listen parameter are mutually exclusive.
 
 Default: NO
 .TP
