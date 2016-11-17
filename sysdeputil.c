@@ -354,12 +354,16 @@ vsf_sysdep_check_auth(struct mystr* p_user_str,
     return 0;
   }
 #ifdef PAM_RHOST
-  sin.sin_addr.s_addr = inet_addr(str_getbuf(p_remote_host));
-  host = gethostbyaddr((char*)&sin.sin_addr.s_addr,sizeof(struct in_addr),AF_INET);
-  if (host != (struct hostent*)0)
-    retval = pam_set_item(s_pamh, PAM_RHOST, host->h_name);
-  else
+  if (tunable_reverse_lookup_enable) {
+    sin.sin_addr.s_addr = inet_addr(str_getbuf(p_remote_host));
+    host = gethostbyaddr((char*)&sin.sin_addr.s_addr,sizeof(struct in_addr),AF_INET);
+    if (host != (struct hostent*)0)
+      retval = pam_set_item(s_pamh, PAM_RHOST, host->h_name);
+    else
+      retval = pam_set_item(s_pamh, PAM_RHOST, str_getbuf(p_remote_host));
+  } else {
     retval = pam_set_item(s_pamh, PAM_RHOST, str_getbuf(p_remote_host));
+  }
   if (retval != PAM_SUCCESS)
   {
     (void) pam_end(s_pamh, retval);

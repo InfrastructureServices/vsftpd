@@ -425,6 +425,15 @@ http://scarybeastsecurity.blogspot.com/2009/02/vsftpd-210-released.html
 
 Default: YES
 .TP
+.B reverse_lookup_enable
+Set to YES if you want vsftpd to transform the ip address into the hostname,
+before pam authentication. This is useful if you use pam_access including the
+hostname. If you want vsftpd to run on the environment where the reverse lookup
+for some hostname is available and the name server doesn't respond for a while,
+you should set this to NO to avoid a performance issue.
+
+Default: YES
+.TP
 .B run_as_launching_user
 Set to YES if you want vsftpd to run as the user which launched vsftpd. This is
 useful where root access is not available. MASSIVE WARNING! Do NOT enable this

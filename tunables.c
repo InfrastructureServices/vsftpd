@@ -72,6 +72,7 @@ int tunable_force_anon_data_ssl;
 int tunable_mdtm_write;
 int tunable_lock_upload_files;
 int tunable_pasv_addr_resolve;
+int tunable_reverse_lookup_enable;
 int tunable_userlist_log;
 int tunable_debug_ssl;
 int tunable_require_cert;
@@ -213,6 +214,7 @@ tunables_load_defaults()
   tunable_mdtm_write = 1;
   tunable_lock_upload_files = 1;
   tunable_pasv_addr_resolve = 0;
+  tunable_reverse_lookup_enable = 1;
   tunable_userlist_log = 0;
   tunable_debug_ssl = 0;
   tunable_require_cert = 0;

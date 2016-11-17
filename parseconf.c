@@ -91,6 +91,7 @@ parseconf_bool_array[] =
   { "mdtm_write", &tunable_mdtm_write },
   { "lock_upload_files", &tunable_lock_upload_files },
   { "pasv_addr_resolve", &tunable_pasv_addr_resolve },
+  { "reverse_lookup_enable", &tunable_reverse_lookup_enable },
   { "userlist_log", &tunable_userlist_log },
   { "debug_ssl", &tunable_debug_ssl },
   { "require_cert", &tunable_require_cert },

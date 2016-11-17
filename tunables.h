@@ -73,6 +73,7 @@ extern int tunable_force_anon_data_ssl;       /* Require anon data uses SSL */
 extern int tunable_mdtm_write;                /* Allow MDTM to set timestamps */
 extern int tunable_lock_upload_files;         /* Lock uploading files */
 extern int tunable_pasv_addr_resolve;         /* DNS resolve pasv_addr */
+extern int tunable_reverse_lookup_enable;     /* Get hostname before pam auth */
 extern int tunable_userlist_log;              /* Log every failed login attempt */
 extern int tunable_debug_ssl;                 /* Verbose SSL logging */
 extern int tunable_require_cert;              /* SSL client cert required */
