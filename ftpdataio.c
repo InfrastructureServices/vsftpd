@@ -249,7 +249,7 @@ handle_io(int retval, int fd, void* p_private)
 {
   long curr_sec;
   long curr_usec;
-  unsigned int bw_rate;
+  unsigned long bw_rate;
   double elapsed;
   double pause_time;
   double rate_ratio;
@@ -276,19 +276,16 @@ handle_io(int retval, int fd, void* p_private)
   {
     elapsed = (double) 0.01;
   }
-  bw_rate = (unsigned int) ((double) retval / elapsed);
-  if (bw_rate <= p_sess->bw_rate_max)
+  p_sess->bw_retval += retval;
+  bw_rate = (unsigned long) ((double) p_sess->bw_retval / elapsed);
+  if (bw_rate <= p_sess->bw_rate_max || p_sess->bw_retval < (unsigned long)(10*retval))
   {
-    p_sess->bw_send_start_sec = curr_sec;
-    p_sess->bw_send_start_usec = curr_usec;
     return;
   }
   /* Tut! Rate exceeded, calculate a pause to bring things back into line */
   rate_ratio = (double) bw_rate / (double) p_sess->bw_rate_max;
   pause_time = (rate_ratio - (double) 1) * elapsed;
   vsf_sysutil_sleep(pause_time);
-  p_sess->bw_send_start_sec = vsf_sysutil_get_time_sec();
-  p_sess->bw_send_start_usec = vsf_sysutil_get_time_usec();
 }
 
 int
@@ -441,6 +438,9 @@ struct vsf_transfer_ret
 vsf_ftpdataio_transfer_file(struct vsf_session* p_sess, int remote_fd,
                             int file_fd, int is_recv, int is_ascii)
 {
+  p_sess->bw_send_start_sec = vsf_sysutil_get_time_sec();
+  p_sess->bw_send_start_usec = vsf_sysutil_get_time_usec();
+  p_sess->bw_retval = 0;
   if (!is_recv)
   {
     if (is_ascii || p_sess->data_use_ssl)

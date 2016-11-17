@@ -40,7 +40,7 @@ main(int argc, const char* argv[])
     /* Control connection */
     0, 0, 0, 0, 0,
     /* Data connection */
-    -1, 0, -1, 0, 0, 0, 0,
+    -1, 0, -1, 0, 0, 0, 0, 0,
     /* Login */
     1, 0, INIT_MYSTR, INIT_MYSTR,
     /* Protocol state */

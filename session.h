@@ -29,9 +29,10 @@ struct vsf_session
   struct vsf_sysutil_sockaddr* p_port_sockaddr;
   int data_fd;
   int data_progress;
-  unsigned int bw_rate_max;
+  unsigned long bw_rate_max;
   long bw_send_start_sec;
   long bw_send_start_usec;
+  unsigned long bw_retval;
 
   /* Details of the login */
   int is_anonymous;
