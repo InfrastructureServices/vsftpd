@@ -32,7 +32,7 @@ vsf_log_init(struct vsf_session* p_sess)
 {
   if (tunable_syslog_enable || tunable_tcp_wrappers)
   {
-    vsf_sysutil_openlog(1);
+    vsf_sysutil_openlog(0);
   }
   if (!tunable_xferlog_enable && !tunable_dual_log_enable)
   {
