@@ -893,6 +893,12 @@ to be in the same file as the certificate.
 
 Default: (none)
 .TP
+.B dh_param_file
+This option specifies the location of the custom parameters used for
+ephemeral Diffie-Hellman key exchange in SSL.
+
+Default: (none - use built in parameters appropriate for certificate key size)
+.TP
 .B email_password_file
 This option can be used to provide an alternate file for usage by the
 .BR secure_email_list_enable

@@ -28,6 +28,8 @@
 #include <openssl/err.h>
 #include <openssl/rand.h>
 #include <openssl/bio.h>
+#include <openssl/dh.h>
+#include <openssl/bn.h>
 #include <errno.h>
 #include <limits.h>
 
@@ -38,6 +40,7 @@ static void setup_bio_callbacks();
 static long bio_callback(
   BIO* p_bio, int oper, const char* p_arg, int argi, long argl, long retval);
 static int ssl_verify_callback(int verify_ok, X509_STORE_CTX* p_ctx);
+static DH *ssl_tmp_dh_callback(SSL *ssl, int is_export, int keylength);
 static int ssl_cert_digest(
   SSL* p_ssl, struct vsf_session* p_sess, struct mystr* p_str);
 static void maybe_log_shutdown_state(struct vsf_session* p_sess);
@@ -50,6 +53,60 @@ static int ssl_read_common(struct vsf_session* p_sess,
 
 static int ssl_inited;
 static struct mystr debug_str;
+
+
+// Grab prime number from OpenSSL; <openssl/bn.h>
+// (get_rfc*) for all available primes.
+// wraps selection of comparable algorithm strength
+#if !defined(match_dh_bits)
+  #define match_dh_bits(keylen) \
+    keylen >= 8191 ? 8192 : \
+    keylen >= 6143 ? 6144 : \
+    keylen >= 4095 ? 4096 : \
+    keylen >= 3071 ? 3072 : \
+    keylen >= 2047 ? 2048 : \
+    keylen >= 1535 ? 1536 : \
+    keylen >= 1023 ? 1024 : 768
+#endif
+
+#if !defined(DH_get_prime)
+  BIGNUM *
+  DH_get_prime(int bits)
+  {
+    switch (bits) {
+      case 768:  return get_rfc2409_prime_768(NULL);
+      case 1024: return get_rfc2409_prime_1024(NULL);
+      case 1536: return get_rfc3526_prime_1536(NULL);
+      case 2048: return get_rfc3526_prime_2048(NULL);
+      case 3072: return get_rfc3526_prime_3072(NULL);
+      case 4096: return get_rfc3526_prime_4096(NULL);
+      case 6144: return get_rfc3526_prime_6144(NULL);
+      case 8192: return get_rfc3526_prime_8192(NULL);
+      // shouldn't happen when used match_dh_bits; strict compiler
+      default:   return NULL;
+    }
+}
+#endif
+
+#if !defined(DH_get_dh)
+  // Grab DH parameters
+  DH *
+  DH_get_dh(int size)
+  {
+    DH *dh = DH_new();
+    if (!dh) {
+      return NULL;
+    }
+    dh->p = DH_get_prime(match_dh_bits(size));
+    BN_dec2bn(&dh->g, "2");
+    if (!dh->p || !dh->g)
+    {
+      DH_free(dh);
+      return NULL;
+    }
+    return dh;
+  }
+#endif
 
 void
 ssl_init(struct vsf_session* p_sess)
@@ -65,7 +122,7 @@ ssl_init(struct vsf_session* p_sess)
     {
       die("SSL: could not allocate SSL context");
     }
-    options = SSL_OP_ALL;
+    options = SSL_OP_ALL | SSL_OP_SINGLE_DH_USE;
     if (!tunable_sslv2)
     {
       options |= SSL_OP_NO_SSLv2;
@@ -109,6 +166,25 @@ ssl_init(struct vsf_session* p_sess)
       if (SSL_CTX_use_PrivateKey_file(p_ctx, p_key, X509_FILETYPE_PEM) != 1)
       {
         die("SSL: cannot load DSA private key");
+      }
+    }
+    if (tunable_dh_param_file)
+    {
+      BIO *bio;
+      DH *dhparams = NULL;
+      if ((bio = BIO_new_file(tunable_dh_param_file, "r")) == NULL)
+      {
+        die("SSL: cannot load custom DH params");
+      }
+      else
+      {
+        dhparams = PEM_read_bio_DHparams(bio, NULL, NULL, NULL);
+        BIO_free(bio);
+
+        if (!SSL_CTX_set_tmp_dh(p_ctx, dhparams))
+	{
+          die("SSL: setting custom DH params failed");
+	}
       }
     }
     if (tunable_ssl_ciphers &&
@@ -165,6 +241,9 @@ ssl_init(struct vsf_session* p_sess)
       /* Ensure cached session doesn't expire */
       SSL_CTX_set_timeout(p_ctx, INT_MAX);
     }
+    
+    SSL_CTX_set_tmp_dh_callback(p_ctx, ssl_tmp_dh_callback);
+
     p_sess->p_ssl_ctx = p_ctx;
     ssl_inited = 1;
   }
@@ -700,6 +779,18 @@ ssl_verify_callback(int verify_ok, X509_STORE_CTX* p_ctx)
     return verify_ok;
   }
   return 1;
+}
+
+#define UNUSED(x) ( (void)(x) )
+
+static DH *
+ssl_tmp_dh_callback(SSL *ssl, int is_export, int keylength)
+{
+  // strict compiler bypassing
+  UNUSED(ssl);
+  UNUSED(is_export);
+  
+  return DH_get_dh(keylength);
 }
 
 void
