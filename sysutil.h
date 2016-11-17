@@ -177,7 +177,7 @@ struct vsf_sysutil_wait_retval
   int PRIVATE_HANDS_OFF_syscall_retval;
   int PRIVATE_HANDS_OFF_exit_status;
 };
-struct vsf_sysutil_wait_retval vsf_sysutil_wait(void);
+struct vsf_sysutil_wait_retval vsf_sysutil_wait(int hang);
 int vsf_sysutil_wait_reap_one(void);
 int vsf_sysutil_wait_get_retval(
   const struct vsf_sysutil_wait_retval* p_waitret);

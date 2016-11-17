@@ -47,8 +47,17 @@ static void
 handle_sigchld(void* duff)
 {
 
-  struct vsf_sysutil_wait_retval wait_retval = vsf_sysutil_wait();
+  struct vsf_sysutil_wait_retval wait_retval = vsf_sysutil_wait(0);
   (void) duff;
+  if (!vsf_sysutil_wait_get_exitcode(&wait_retval) &&
+      !vsf_sysutil_wait_get_retval(&wait_retval))
+    /* There was nobody to wait for, possibly caused by underlying library
+     * which created a new process through fork()/vfork() and already picked
+     * it up, e.g. by pam_exec.so or integrity check routines for libraries
+     * when FIPS mode is on (nss freebl), which can lead to calling prelink
+     * if the prelink package is installed.
+     */
+    return;
   /* Child died, so we'll do the same! Report it as an error unless the child
    * exited normally with zero exit code
    */
@@ -390,7 +399,7 @@ common_do_login(struct vsf_session* p_sess, const struct mystr* p_user_str,
   priv_sock_send_result(p_sess->parent_fd, PRIV_SOCK_RESULT_OK);
   if (!p_sess->control_use_ssl)
   {
-    (void) vsf_sysutil_wait();
+    (void) vsf_sysutil_wait(1);
   }
   else
   {

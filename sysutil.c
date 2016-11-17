@@ -608,13 +608,13 @@ vsf_sysutil_exit(int exit_code)
 }
 
 struct vsf_sysutil_wait_retval
-vsf_sysutil_wait(void)
+vsf_sysutil_wait(int hang)
 {
   struct vsf_sysutil_wait_retval retval;
   vsf_sysutil_memclr(&retval, sizeof(retval));
   while (1)
   {
-    int sys_ret = wait(&retval.exit_status);
+    int sys_ret = waitpid(-1, &retval.exit_status, hang ? 0 : WNOHANG);
     if (sys_ret < 0 && errno == EINTR)
     {
       vsf_sysutil_check_pending_actions(kVSFSysUtilUnknown, 0, 0);
