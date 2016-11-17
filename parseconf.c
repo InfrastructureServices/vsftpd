@@ -85,6 +85,8 @@ parseconf_bool_array[] =
   { "ssl_sslv2", &tunable_sslv2 },
   { "ssl_sslv3", &tunable_sslv3 },
   { "ssl_tlsv1", &tunable_tlsv1 },
+  { "ssl_tlsv1_1", &tunable_tlsv1_1 },
+  { "ssl_tlsv1_2", &tunable_tlsv1_2 },
   { "tilde_user_enable", &tunable_tilde_user_enable },
   { "force_anon_logins_ssl", &tunable_force_anon_logins_ssl },
   { "force_anon_data_ssl", &tunable_force_anon_data_ssl },

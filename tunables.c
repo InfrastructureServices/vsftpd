@@ -66,6 +66,8 @@ int tunable_force_local_data_ssl;
 int tunable_sslv2;
 int tunable_sslv3;
 int tunable_tlsv1;
+int tunable_tlsv1_1;
+int tunable_tlsv1_2;
 int tunable_tilde_user_enable;
 int tunable_force_anon_logins_ssl;
 int tunable_force_anon_data_ssl;
@@ -209,7 +211,10 @@ tunables_load_defaults()
   tunable_force_local_data_ssl = 1;
   tunable_sslv2 = 0;
   tunable_sslv3 = 0;
+  /* TLSv1 up to TLSv1.2 is enabled by default */
   tunable_tlsv1 = 1;
+  tunable_tlsv1_1 = 1;
+  tunable_tlsv1_2 = 1;
   tunable_tilde_user_enable = 0;
   tunable_force_anon_logins_ssl = 0;
   tunable_force_anon_data_ssl = 0;
@@ -292,8 +297,8 @@ tunables_load_defaults()
   install_str_setting(0, &tunable_dsa_cert_file);
   install_str_setting(0, &tunable_dh_param_file);
   install_str_setting(0, &tunable_ecdh_param_file);
-  install_str_setting("AES128-SHA:DES-CBC3-SHA:DHE-RSA-AES256-SHA:ECDHE-RSA-AES128-SHA",
-                      &tunable_ssl_ciphers);
+  install_str_setting("AES128-SHA:DES-CBC3-SHA:DHE-RSA-AES256-SHA:ECDHE-RSA-AES128-SHA:ECDHE-RSA-AES256-GCM-SHA384:ECDHE-ECDSA-AES256-GCM-SHA384",
+          &tunable_ssl_ciphers);
   install_str_setting(0, &tunable_rsa_private_key_file);
   install_str_setting(0, &tunable_dsa_private_key_file);
   install_str_setting(0, &tunable_ca_certs_file);

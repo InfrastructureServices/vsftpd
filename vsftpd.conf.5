@@ -506,7 +506,7 @@ Default: YES
 Only applies if
 .BR ssl_enable
 is activated. If enabled, this option will permit SSL v2 protocol connections.
-TLS v1 connections are preferred.
+TLS v1.2 connections are preferred.
 
 Default: NO
 .TP
@@ -514,7 +514,7 @@ Default: NO
 Only applies if
 .BR ssl_enable
 is activated. If enabled, this option will permit SSL v3 protocol connections.
-TLS v1 connections are preferred.
+TLS v1.2 connections are preferred.
 
 Default: NO
 .TP
@@ -522,7 +522,23 @@ Default: NO
 Only applies if
 .BR ssl_enable
 is activated. If enabled, this option will permit TLS v1 protocol connections.
-TLS v1 connections are preferred.
+TLS v1.2 connections are preferred.
+
+Default: YES
+.TP
+.B ssl_tlsv1_1
+Only applies if
+.BR ssl_enable
+is activated. If enabled, this option will permit TLS v1.1 protocol connections.
+TLS v1.2 connections are preferred.
+
+Default: YES
+.TP
+.B ssl_tlsv1_2
+Only applies if
+.BR ssl_enable
+is activated. If enabled, this option will permit TLS v1.2 protocol connections.
+TLS v1.2 connections are preferred.
 
 Default: YES
 .TP
@@ -1044,7 +1060,7 @@ man page for further details. Note that restricting ciphers can be a useful
 security precaution as it prevents malicious remote parties forcing a cipher
 which they have found problems with.
 
-Default: DES-CBC3-SHA
+Default: AES128-SHA:DES-CBC3-SHA:DHE-RSA-AES256-SHA:ECDHE-RSA-AES128-SHA:ECDHE-RSA-AES256-GCM-SHA384:ECDHE-ECDSA-AES256-GCM-SHA384
 .TP
 .B user_config_dir
 This powerful option allows the override of any config option specified in
