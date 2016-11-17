@@ -356,7 +356,14 @@ process_post_login(struct vsf_session* p_sess)
     }
     else if (str_equal_text(&p_sess->ftp_cmd_str, "ALLO"))
     {
-      vsf_cmdio_write(p_sess, FTP_ALLOOK, "ALLO command ignored.");
+      if (tunable_delete_failed_uploads && !p_sess->is_ascii)
+      {
+        p_sess->upload_size = (filesize_t)vsf_sysutil_atoi(str_getbuf(&p_sess->ftp_cmd_str)+5);
+        vsf_cmdio_write(p_sess, FTP_ALLOOK, "The filesize has been allocated.");
+      }
+      else {
+        vsf_cmdio_write(p_sess, FTP_ALLOIGN, "ALLO command ignored.");
+      }
     }
     else if (str_equal_text(&p_sess->ftp_cmd_str, "REIN"))
     {

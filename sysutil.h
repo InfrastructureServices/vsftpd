@@ -266,6 +266,7 @@ void vsf_sysutil_dns_resolve(struct vsf_sysutil_sockaddr** p_sockptr,
                              const char* p_name);
 /* Option setting on sockets */
 void vsf_sysutil_activate_keepalive(int fd);
+void vsf_sysutil_rcvtimeo(int fd);
 void vsf_sysutil_set_iptos_throughput(int fd);
 void vsf_sysutil_activate_reuseaddr(int fd);
 void vsf_sysutil_set_nodelay(int fd);

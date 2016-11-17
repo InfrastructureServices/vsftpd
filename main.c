@@ -44,7 +44,7 @@ main(int argc, const char* argv[])
     /* Login */
     1, 0, INIT_MYSTR, INIT_MYSTR,
     /* Protocol state */
-    0, 1, INIT_MYSTR, 0, 0,
+    0, 0, 1, INIT_MYSTR, 0, 0,
     /* HTTP hacks */
     0, INIT_MYSTR,
     /* Session state */

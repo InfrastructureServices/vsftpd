@@ -242,6 +242,10 @@ init_data_sock_params(struct vsf_session* p_sess, int sock_fd)
   /* Start the timeout monitor */
   vsf_sysutil_install_io_handler(handle_io, p_sess);
   start_data_alarm(p_sess);
+  if(tunable_delete_failed_uploads)
+  {
+    vsf_sysutil_rcvtimeo(sock_fd);
+  }
 }
 
 static void
@@ -615,6 +619,10 @@ do_file_recv(struct vsf_session* p_sess, int file_fd, int is_ascii)
     else if (retval == 0 && !prev_cr)
     {
       /* Transfer done, nifty */
+      if (tunable_delete_failed_uploads &&
+          !is_ascii && p_sess->upload_size > 0 &&
+          p_sess->upload_size != ret_struct.transferred)
+        ret_struct.retval = -2;
       return ret_struct;
     }
     num_to_write = (unsigned int) retval;

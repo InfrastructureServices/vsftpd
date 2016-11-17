@@ -41,6 +41,7 @@ struct vsf_session
   struct mystr anon_pass_str;
 
   /* Details of the FTP protocol state */
+  filesize_t upload_size;
   filesize_t restart_pos;
   int is_ascii;
   struct mystr rnfr_filename_str;

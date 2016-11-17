@@ -681,6 +681,16 @@ vsf_sysutil_activate_keepalive(int fd)
 }
 
 void
+vsf_sysutil_rcvtimeo(int fd)
+{
+  struct timeval tv;
+
+  tv.tv_sec = tunable_data_connection_timeout;
+  tv.tv_usec = 0;
+  setsockopt(fd, SOL_SOCKET, SO_RCVTIMEO, &tv, sizeof(struct timeval));
+}
+
+void
 vsf_sysutil_activate_reuseaddr(int fd)
 {
   int reuseaddr = 1;
