@@ -1632,6 +1632,9 @@ vsf_sysutil_get_error(void)
     case ENOENT:
       retval = kVSFSysUtilErrNOENT;
       break;
+    case EAGAIN:
+      retval = kVSFSysUtilErrAGAIN;
+      break;
     default:
       break;
   }

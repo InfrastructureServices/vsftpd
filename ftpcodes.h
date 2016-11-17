@@ -52,6 +52,7 @@
 #define FTP_TLS_FAIL          421
 #define FTP_BADSENDCONN       425
 #define FTP_BADSENDNET        426
+#define FTP_FILETMPFAIL       450
 #define FTP_BADSENDFILE       451
 
 #define FTP_BADCMD            500

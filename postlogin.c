@@ -679,7 +679,14 @@ handle_retr(struct vsf_session* p_sess, int is_http)
   opened_file = str_open(&p_sess->ftp_arg_str, kVSFSysStrOpenReadOnly);
   if (vsf_sysutil_retval_is_error(opened_file))
   {
-    vsf_cmdio_write(p_sess, FTP_FILEFAIL, "Failed to open file.");
+    if (kVSFSysUtilErrAGAIN == vsf_sysutil_get_error())
+    {
+      vsf_cmdio_write(p_sess, FTP_FILETMPFAIL, "Temporarily failed to open file");
+    }
+    else
+    {
+      vsf_cmdio_write(p_sess, FTP_FILEFAIL, "Failed to open file.");
+    }
     return;
   }
   /* Lock file if required */
