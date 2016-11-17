@@ -459,7 +459,8 @@ vsf_filename_passes_filter(const struct mystr* p_filename_str,
         must_match_at_current_pos = 0;
       }
     } while (locate_result.found &&
-             str_getlen(&name_remain_str) > 0 && last_token != '*');
+             str_getlen(&name_remain_str) > 0 &&
+             last_token != '*' && last_token != '?');
   }
   /* Any incoming string left means no match unless we ended on the correct
    * type of wildcard.
