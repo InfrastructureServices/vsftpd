@@ -899,6 +899,14 @@ ephemeral Diffie-Hellman key exchange in SSL.
 
 Default: (none - use built in parameters appropriate for certificate key size)
 .TP
+.B ecdh_param_file
+This option specifies the location of custom parameters for ephemeral
+Elliptic Curve Diffie-Hellman (ECDH) key exchange.
+
+Default: (none - use built in parameters, NIST P-256 with OpenSSL 1.0.1 and
+automatically selected curve based on client preferences with OpenSSL 1.0.2
+and later)
+.TP
 .B email_password_file
 This option can be used to provide an alternate file for usage by the
 .BR secure_email_list_enable

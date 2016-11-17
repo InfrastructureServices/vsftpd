@@ -141,6 +141,7 @@ const char* tunable_email_password_file;
 const char* tunable_rsa_cert_file;
 const char* tunable_dsa_cert_file;
 const char* tunable_dh_param_file;
+const char* tunable_ecdh_param_file;
 const char* tunable_ssl_ciphers;
 const char* tunable_rsa_private_key_file;
 const char* tunable_dsa_private_key_file;
@@ -290,7 +291,8 @@ tunables_load_defaults()
                       &tunable_rsa_cert_file);
   install_str_setting(0, &tunable_dsa_cert_file);
   install_str_setting(0, &tunable_dh_param_file);
-  install_str_setting("AES128-SHA:DES-CBC3-SHA:DHE-RSA-AES256-SHA",
+  install_str_setting(0, &tunable_ecdh_param_file);
+  install_str_setting("AES128-SHA:DES-CBC3-SHA:DHE-RSA-AES256-SHA:ECDHE-RSA-AES128-SHA",
                       &tunable_ssl_ciphers);
   install_str_setting(0, &tunable_rsa_private_key_file);
   install_str_setting(0, &tunable_dsa_private_key_file);

@@ -122,7 +122,7 @@ ssl_init(struct vsf_session* p_sess)
     {
       die("SSL: could not allocate SSL context");
     }
-    options = SSL_OP_ALL | SSL_OP_SINGLE_DH_USE;
+    options = SSL_OP_ALL | SSL_OP_SINGLE_DH_USE | SSL_OP_SINGLE_ECDH_USE;
     if (!tunable_sslv2)
     {
       options |= SSL_OP_NO_SSLv2;
@@ -243,6 +243,41 @@ ssl_init(struct vsf_session* p_sess)
     }
     
     SSL_CTX_set_tmp_dh_callback(p_ctx, ssl_tmp_dh_callback);
+
+    if (tunable_ecdh_param_file)
+    {
+      BIO *bio;
+      int nid;
+      EC_GROUP *ecparams = NULL;
+      EC_KEY *eckey;
+
+      if ((bio = BIO_new_file(tunable_ecdh_param_file, "r")) == NULL)
+        die("SSL: cannot load custom ec params");
+      else
+      {
+        ecparams = PEM_read_bio_ECPKParameters(bio, NULL, NULL, NULL);
+        BIO_free(bio);
+
+        if (ecparams && (nid = EC_GROUP_get_curve_name(ecparams)) &&
+            (eckey = EC_KEY_new_by_curve_name(nid)))
+        {
+          if (!SSL_CTX_set_tmp_ecdh(p_ctx, eckey))
+            die("SSL: setting custom EC params failed");
+	}
+	else
+        {
+          die("SSL: getting ec group or key failed");
+	}
+      }
+    }
+    else
+    {
+#if defined(SSL_CTX_set_ecdh_auto)
+      SSL_CTX_set_ecdh_auto(p_ctx, 1);
+#else
+      SSL_CTX_set_tmp_ecdh(p_ctx, EC_KEY_new_by_curve_name(NID_X9_62_prime256v1));
+#endif
+    }
 
     p_sess->p_ssl_ctx = p_ctx;
     ssl_inited = 1;

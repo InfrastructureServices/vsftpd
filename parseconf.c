@@ -177,6 +177,7 @@ parseconf_str_array[] =
   { "rsa_cert_file", &tunable_rsa_cert_file },
   { "dsa_cert_file", &tunable_dsa_cert_file },
   { "dh_param_file", &tunable_dh_param_file },
+  { "ecdh_param_file", &tunable_ecdh_param_file },
   { "ssl_ciphers", &tunable_ssl_ciphers },
   { "rsa_private_key_file", &tunable_rsa_private_key_file },
   { "dsa_private_key_file", &tunable_dsa_private_key_file },
