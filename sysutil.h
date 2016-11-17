@@ -92,6 +92,7 @@ int vsf_sysutil_create_or_open_file_append(const char* p_filename,
 int vsf_sysutil_create_or_open_file(const char* p_filename, unsigned int mode);
 void vsf_sysutil_dupfd2(int old_fd, int new_fd);
 void vsf_sysutil_close(int fd);
+int vsf_sysutil_close_errno(int fd);
 int vsf_sysutil_close_failok(int fd);
 int vsf_sysutil_unlink(const char* p_dead);
 int vsf_sysutil_write_access(const char* p_filename);

@@ -28,6 +28,8 @@
 #include "vsftpver.h"
 #include "opts.h"
 
+#include <errno.h>
+
 /* Private local functions */
 static void handle_pwd(struct vsf_session* p_sess);
 static void handle_cwd(struct vsf_session* p_sess);
@@ -1035,8 +1037,10 @@ handle_upload_common(struct vsf_session* p_sess, int is_append, int is_unique)
   struct vsf_transfer_ret trans_ret;
   int new_file_fd;
   int remote_fd;
+  int close_errno;
   int success = 0;
   int created = 0;
+  int closed = 0;
   int do_truncate = 0;
   filesize_t offset = p_sess->restart_pos;
   p_sess->restart_pos = 0;
@@ -1149,6 +1153,18 @@ handle_upload_common(struct vsf_session* p_sess, int is_append, int is_unique)
     trans_ret = vsf_ftpdataio_transfer_file(p_sess, remote_fd,
                                             new_file_fd, 1, 0);
   }
+
+  /* Need to check close operation here because some errors
+   * like EIO, EDQUOT, ENOSPC can be detected only on close
+   * when using NFS
+   */
+  close_errno = vsf_sysutil_close_errno(new_file_fd);
+  closed = 1;
+  if (close_errno != 0)
+  {
+    trans_ret.retval = -1;
+  }
+
   if (vsf_ftpdataio_dispose_transfer_fd(p_sess) != 1 && trans_ret.retval == 0)
   {
     trans_ret.retval = -2;
@@ -1161,7 +1177,16 @@ handle_upload_common(struct vsf_session* p_sess, int is_append, int is_unique)
   }
   if (trans_ret.retval == -1)
   {
-    vsf_cmdio_write(p_sess, FTP_BADSENDFILE, "Failure writing to local file.");
+    /* Disk quota exceeded */
+    if (close_errno == EDQUOT)
+    {
+      vsf_cmdio_write(p_sess, FTP_DISKQUOTA, "Disk quota exceeded.");
+    }
+    /* any other local error */
+    else
+    {
+      vsf_cmdio_write(p_sess, FTP_BADSENDFILE, "Failure writing to local file.");
+    }
   }
   else if (trans_ret.retval == -2)
   {
@@ -1183,7 +1208,10 @@ port_pasv_cleanup_out:
   {
     str_unlink(p_filename);
   }
-  vsf_sysutil_close(new_file_fd);
+  if (!closed)
+  {
+    vsf_sysutil_close(new_file_fd);
+  }
 }
 
 static void

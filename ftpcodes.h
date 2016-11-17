@@ -74,6 +74,7 @@
 #define FTP_NOHANDLEPROT      536
 #define FTP_FILEFAIL          550
 #define FTP_NOPERM            550
+#define FTP_DISKQUOTA         552
 #define FTP_UPLOADFAIL        553
 
 #endif /* VSF_FTPCODES_H */

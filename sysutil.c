@@ -1269,6 +1269,27 @@ vsf_sysutil_close(int fd)
 }
 
 int
+vsf_sysutil_close_errno(int fd)
+{
+  while (1)
+  {
+    int retval = close(fd);
+    if (retval != 0)
+    {
+      if (errno == EINTR)
+      {
+        vsf_sysutil_check_pending_actions(kVSFSysUtilUnknown, 0, 0);
+        continue;
+      }
+      else {
+        return errno;
+      }
+    }
+    return 0;
+  }
+}
+
+int
 vsf_sysutil_close_failok(int fd)
 {
   return close(fd);
