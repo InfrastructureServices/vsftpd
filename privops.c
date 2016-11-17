@@ -236,8 +236,7 @@ vsf_privop_do_file_chown(struct vsf_session* p_sess, int fd)
   /* Drop it like a hot potato unless it's a regular file owned by
    * the the anonymous ftp user
    */
-  if (p_sess->anon_upload_chown_uid == -1 ||
-      !vsf_sysutil_statbuf_is_regfile(s_p_statbuf) ||
+  if (!vsf_sysutil_statbuf_is_regfile(s_p_statbuf) ||
       (vsf_sysutil_statbuf_get_uid(s_p_statbuf) != p_sess->anon_ftp_uid &&
        vsf_sysutil_statbuf_get_uid(s_p_statbuf) != p_sess->guest_user_uid))
   {

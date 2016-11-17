@@ -54,9 +54,9 @@ struct vsf_session
   struct mystr_list* p_visited_dir_list;
 
   /* Details of userids which are interesting to us */
-  int anon_ftp_uid;
-  int guest_user_uid;
-  int anon_upload_chown_uid;
+  unsigned int anon_ftp_uid;
+  unsigned int guest_user_uid;
+  unsigned int anon_upload_chown_uid;
 
   /* Things we need to cache before we chroot() */
   struct mystr banned_email_str;

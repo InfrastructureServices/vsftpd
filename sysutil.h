@@ -129,15 +129,15 @@ const char* vsf_sysutil_statbuf_get_numeric_date(
   const struct vsf_sysutil_statbuf* p_stat, int use_localtime);
 unsigned int vsf_sysutil_statbuf_get_links(
   const struct vsf_sysutil_statbuf* p_stat);
-int vsf_sysutil_statbuf_get_uid(const struct vsf_sysutil_statbuf* p_stat);
-int vsf_sysutil_statbuf_get_gid(const struct vsf_sysutil_statbuf* p_stat);
+unsigned int vsf_sysutil_statbuf_get_uid(const struct vsf_sysutil_statbuf* p_stat);
+unsigned int vsf_sysutil_statbuf_get_gid(const struct vsf_sysutil_statbuf* p_stat);
 int vsf_sysutil_statbuf_is_readable_other(
   const struct vsf_sysutil_statbuf* p_stat);
 const char* vsf_sysutil_statbuf_get_sortkey_mtime(
   const struct vsf_sysutil_statbuf* p_stat);
 
 int vsf_sysutil_chmod(const char* p_filename, unsigned int mode);
-void vsf_sysutil_fchown(const int fd, const int uid, const int gid);
+void vsf_sysutil_fchown(const int fd, const unsigned int uid, const unsigned int gid);
 void vsf_sysutil_fchmod(const int fd, unsigned int mode);
 int vsf_sysutil_readlink(const char* p_filename, char* p_dest,
                          unsigned int bufsiz);
@@ -290,15 +290,15 @@ int vsf_sysutil_inet_aton(
 struct vsf_sysutil_user;
 struct vsf_sysutil_group;
 
-struct vsf_sysutil_user* vsf_sysutil_getpwuid(const int uid);
+struct vsf_sysutil_user* vsf_sysutil_getpwuid(const unsigned int uid);
 struct vsf_sysutil_user* vsf_sysutil_getpwnam(const char* p_user);
 const char* vsf_sysutil_user_getname(const struct vsf_sysutil_user* p_user);
 const char* vsf_sysutil_user_get_homedir(
   const struct vsf_sysutil_user* p_user);
-int vsf_sysutil_user_getuid(const struct vsf_sysutil_user* p_user);
-int vsf_sysutil_user_getgid(const struct vsf_sysutil_user* p_user);
+unsigned int vsf_sysutil_user_getuid(const struct vsf_sysutil_user* p_user);
+unsigned int vsf_sysutil_user_getgid(const struct vsf_sysutil_user* p_user);
 
-struct vsf_sysutil_group* vsf_sysutil_getgrgid(const int gid);
+struct vsf_sysutil_group* vsf_sysutil_getgrgid(const unsigned int gid);
 const char* vsf_sysutil_group_getname(const struct vsf_sysutil_group* p_group);
 
 /* More random things */
@@ -316,7 +316,7 @@ void vsf_sysutil_qsort(void* p_base, unsigned int num_elem,
 char* vsf_sysutil_getenv(const char* p_var);
 typedef void (*exitfunc_t)(void);
 void vsf_sysutil_set_exit_func(exitfunc_t exitfunc);
-int vsf_sysutil_getuid(void);
+unsigned int vsf_sysutil_getuid(void);
 
 /* Syslogging (bah) */
 void vsf_sysutil_openlog(int force);
@@ -329,8 +329,8 @@ void vsf_sysutil_setuid(const struct vsf_sysutil_user* p_user);
 void vsf_sysutil_setgid(const struct vsf_sysutil_user* p_user);
 void vsf_sysutil_setuid_numeric(int uid);
 void vsf_sysutil_setgid_numeric(int gid);
-int vsf_sysutil_geteuid(void);
-int vsf_sysutil_getegid(void);
+unsigned int vsf_sysutil_geteuid(void);
+unsigned int vsf_sysutil_getegid(void);
 void vsf_sysutil_seteuid(const struct vsf_sysutil_user* p_user);
 void vsf_sysutil_setegid(const struct vsf_sysutil_user* p_user);
 void vsf_sysutil_seteuid_numeric(int uid);

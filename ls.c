@@ -503,7 +503,7 @@ build_dir_line(struct mystr* p_str, const struct mystr* p_filename_str,
   }
   else
   {
-    int uid = vsf_sysutil_statbuf_get_uid(p_stat);
+    unsigned int uid = vsf_sysutil_statbuf_get_uid(p_stat);
     struct vsf_sysutil_user* p_user = 0;
     if (tunable_text_userdb_names)
     {
@@ -528,7 +528,7 @@ build_dir_line(struct mystr* p_str, const struct mystr* p_filename_str,
   }
   else
   {
-    int gid = vsf_sysutil_statbuf_get_gid(p_stat);
+    unsigned int gid = vsf_sysutil_statbuf_get_gid(p_stat);
     struct vsf_sysutil_group* p_group = 0;
     if (tunable_text_userdb_names)
     {

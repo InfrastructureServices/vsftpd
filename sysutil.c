@@ -1454,14 +1454,14 @@ vsf_sysutil_statbuf_get_size(const struct vsf_sysutil_statbuf* p_statbuf)
   return p_stat->st_size;
 }
 
-int
+unsigned int
 vsf_sysutil_statbuf_get_uid(const struct vsf_sysutil_statbuf* p_statbuf)
 {
   const struct stat* p_stat = (const struct stat*) p_statbuf;
   return p_stat->st_uid;
 }
 
-int
+unsigned int
 vsf_sysutil_statbuf_get_gid(const struct vsf_sysutil_statbuf* p_statbuf)
 {
   const struct stat* p_stat = (const struct stat*) p_statbuf;
@@ -1502,7 +1502,7 @@ vsf_sysutil_statbuf_get_sortkey_mtime(
 }
 
 void
-vsf_sysutil_fchown(const int fd, const int uid, const int gid)
+vsf_sysutil_fchown(const int fd, const unsigned int uid, const unsigned int gid)
 {
   if (fchown(fd, uid, gid) != 0)
   {
@@ -2320,13 +2320,9 @@ vsf_sysutil_dns_resolve(struct vsf_sysutil_sockaddr** p_sockptr,
 }
 
 struct vsf_sysutil_user*
-vsf_sysutil_getpwuid(const int uid)
+vsf_sysutil_getpwuid(const unsigned int uid)
 {
-  if (uid < 0)
-  {
-    bug("negative uid in vsf_sysutil_getpwuid");
-  }
-  return (struct vsf_sysutil_user*) getpwuid((unsigned int) uid);
+  return (struct vsf_sysutil_user*) getpwuid(uid);
 }
 
 struct vsf_sysutil_user*
@@ -2349,14 +2345,14 @@ vsf_sysutil_user_get_homedir(const struct vsf_sysutil_user* p_user)
   return p_passwd->pw_dir;
 }
 
-int
+unsigned int
 vsf_sysutil_user_getuid(const struct vsf_sysutil_user* p_user)
 {
   const struct passwd* p_passwd = (const struct passwd*) p_user;
   return p_passwd->pw_uid;
 }
 
-int
+unsigned int
 vsf_sysutil_user_getgid(const struct vsf_sysutil_user* p_user)
 { 
   const struct passwd* p_passwd = (const struct passwd*) p_user;
@@ -2364,13 +2360,9 @@ vsf_sysutil_user_getgid(const struct vsf_sysutil_user* p_user)
 }
 
 struct vsf_sysutil_group*
-vsf_sysutil_getgrgid(const int gid)
+vsf_sysutil_getgrgid(const unsigned int gid)
 {
-  if (gid < 0)
-  {
-    die("negative gid in vsf_sysutil_getgrgid");
-  }
-  return (struct vsf_sysutil_group*) getgrgid((unsigned int) gid);
+  return (struct vsf_sysutil_group*) getgrgid(gid);
 }
 
 const char*
@@ -2445,25 +2437,17 @@ vsf_sysutil_setgid_numeric(int gid)
   }
 }
 
-int
+unsigned int
 vsf_sysutil_geteuid(void)
 {
-  int retval = geteuid();
-  if (retval < 0)
-  {
-    die("geteuid");
-  }
+  unsigned int retval = geteuid();
   return retval;
 }
 
-int
+unsigned int
 vsf_sysutil_getegid(void)
 {
-  int retval = getegid();
-  if (retval < 0)
-  {
-    die("getegid");
-  }
+  unsigned int retval = getegid();
   return retval;
 }
 
@@ -2854,7 +2838,7 @@ vsf_sysutil_ftruncate(int fd)
   }
 }
 
-int
+unsigned int
 vsf_sysutil_getuid(void)
 {
   return getuid();
