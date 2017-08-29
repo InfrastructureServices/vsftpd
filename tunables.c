@@ -297,8 +297,7 @@ tunables_load_defaults()
   install_str_setting(0, &tunable_dsa_cert_file);
   install_str_setting(0, &tunable_dh_param_file);
   install_str_setting(0, &tunable_ecdh_param_file);
-  install_str_setting("AES128-SHA:DES-CBC3-SHA:DHE-RSA-AES256-SHA:ECDHE-RSA-AES128-SHA:ECDHE-RSA-AES256-GCM-SHA384:ECDHE-ECDSA-AES256-GCM-SHA384",
-          &tunable_ssl_ciphers);
+  install_str_setting("PROFILE=SYSTEM", &tunable_ssl_ciphers);
   install_str_setting(0, &tunable_rsa_private_key_file);
   install_str_setting(0, &tunable_dsa_private_key_file);
   install_str_setting(0, &tunable_ca_certs_file);
