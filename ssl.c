@@ -88,19 +88,54 @@ static struct mystr debug_str;
 }
 #endif
 
+#if OPENSSL_VERSION_NUMBER < 0x10100000L
+int DH_set0_pqg(DH *dh, BIGNUM *p, BIGNUM *q, BIGNUM *g)
+{
+  /* If the fields p and g in d are NULL, the corresponding input
+   * parameters MUST be non-NULL.  q may remain NULL.
+   */
+  if ((dh->p == NULL && p == NULL)
+      || (dh->g == NULL && g == NULL))
+    return 0;
+
+  if (p != NULL) {
+    BN_free(dh->p);
+    dh->p = p;
+  }
+  if (q != NULL) {
+    BN_free(dh->q);
+    dh->q = q;
+  }
+  if (g != NULL) {
+    BN_free(dh->g);
+    dh->g = g;
+  }
+
+  if (q != NULL) {
+    dh->length = BN_num_bits(q);
+  }
+
+  return 1;
+}
+#endif
+
 #if !defined(DH_get_dh)
   // Grab DH parameters
   DH *
   DH_get_dh(int size)
   {
+    BIGNUM *g = NULL;
+    BIGNUM *p = NULL;
     DH *dh = DH_new();
     if (!dh) {
       return NULL;
     }
-    dh->p = DH_get_prime(match_dh_bits(size));
-    BN_dec2bn(&dh->g, "2");
-    if (!dh->p || !dh->g)
+    p = DH_get_prime(match_dh_bits(size));
+    BN_dec2bn(&g, "2");
+    if (!p || !g || !DH_set0_pqg(dh, p, NULL, g))
     {
+      BN_free(g);
+      BN_free(p);
       DH_free(dh);
       return NULL;
     }
