@@ -3,7 +3,7 @@
 
 #define VSFTP_DEFAULT_CONFIG    "/etc/vsftpd/vsftpd.conf"
 
-#define VSFTP_COMMAND_FD        0
+#define VSFTP_COMMAND_FD        1
 
 #define VSFTP_PASSWORD_MAX      128
 #define VSFTP_USERNAME_MAX      128
