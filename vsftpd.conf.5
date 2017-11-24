@@ -113,11 +113,17 @@ Default: YES
 .TP
 .B ascii_download_enable
 When enabled, ASCII mode data transfers will be honoured on downloads.
+When disabled, the server will pretend to allow ASCII mode but in fact
+ignore the request. Turn this option on to have the server actually do
+ASCII mangling on files when in ASCII mode.
 
 Default: NO
 .TP
 .B ascii_upload_enable
 When enabled, ASCII mode data transfers will be honoured on uploads.
+See also
+.BR ascii_download_enable
+for more details.
 
 Default: NO
 .TP
