@@ -1078,7 +1078,11 @@ man page for further details. Note that restricting ciphers can be a useful
 security precaution as it prevents malicious remote parties forcing a cipher
 which they have found problems with.
 
-Default: AES128-SHA:DES-CBC3-SHA:DHE-RSA-AES256-SHA:ECDHE-RSA-AES128-SHA:ECDHE-RSA-AES256-GCM-SHA384:ECDHE-ECDSA-AES256-GCM-SHA384
+By default, the system-wide crypto policy is used. See
+.BR update-crypto-policies(8)
+for further details.
+
+Default: PROFILE=SYSTEM
 .TP
 .B user_config_dir
 This powerful option allows the override of any config option specified in
