@@ -211,9 +211,9 @@ tunables_load_defaults()
   tunable_force_local_data_ssl = 1;
   tunable_sslv2 = 0;
   tunable_sslv3 = 0;
-  /* TLSv1 up to TLSv1.2 is enabled by default */
-  tunable_tlsv1 = 1;
-  tunable_tlsv1_1 = 1;
+  tunable_tlsv1 = 0;
+  tunable_tlsv1_1 = 0;
+  /* Only TLSv1.2 is enabled by default */
   tunable_tlsv1_2 = 1;
   tunable_tilde_user_enable = 0;
   tunable_force_anon_logins_ssl = 0;
