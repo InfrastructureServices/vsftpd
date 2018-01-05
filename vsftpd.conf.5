@@ -574,10 +574,9 @@ Default: YES
 .B strict_ssl_read_eof
 If enabled, SSL data uploads are required to terminate via SSL, not an
 EOF on the socket. This option is required to be sure that an attacker did
-not terminate an upload prematurely with a faked TCP FIN. Unfortunately, it
-is not enabled by default because so few clients get it right. (New in v2.0.7).
+not terminate an upload prematurely with a faked TCP FIN. (New in v2.0.7).
 
-Default: NO
+Default: YES
 .TP
 .B strict_ssl_write_shutdown
 If enabled, SSL data downloads are required to terminate via SSL, not an
