@@ -1,7 +1,6 @@
 #ifndef VSF_BUILDDEFS_H
 #define VSF_BUILDDEFS_H
 
-#define VSF_BUILD_TCPWRAPPERS
 #define VSF_BUILD_PAM
 #define VSF_BUILD_SSL
 
