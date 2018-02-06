@@ -270,13 +270,21 @@ handle_sigchld(void* duff)
     if (reap_one)
     {
       struct vsf_sysutil_ipaddr* p_ip;
-      /* Account total number of instances */
-      --s_children;
-      /* Account per-IP limit */
       p_ip = (struct vsf_sysutil_ipaddr*)
         hash_lookup_entry(s_p_pid_ip_hash, (void*)&reap_one);
-      drop_ip_count(p_ip);      
-      hash_free_entry(s_p_pid_ip_hash, (void*)&reap_one);
+      /* If we are running in a container as PID 1, it is possible
+       * that we will get SIGCHILD for processes, which were not
+       * created directly by our process and which are not in the
+       * s_p_pid_ip_hash hash table.
+       */
+      if (p_ip)
+      {
+        /* Account total number of instances */
+        --s_children;
+        /* Account per-IP limit */
+        drop_ip_count(p_ip);
+        hash_free_entry(s_p_pid_ip_hash, (void*)&reap_one);
+      }
     }
   }
 }
