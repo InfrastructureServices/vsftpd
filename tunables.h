@@ -93,6 +93,9 @@ extern int tunable_ftp_enable;                /* Allow FTP protocol */
 extern int tunable_http_enable;               /* Allow HTTP protocol */
 extern int tunable_seccomp_sandbox;           /* seccomp filter sandbox */
 extern int tunable_allow_writeable_chroot;    /* Allow misconfiguration */
+extern int tunable_better_stou;               /* Use better file name generation
+                                               * algorithm for the STOU command
+					       */
 
 /* Integer/numeric defines */
 extern unsigned int tunable_accept_timeout;

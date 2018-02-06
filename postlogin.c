@@ -29,6 +29,7 @@
 #include "opts.h"
 
 #include <errno.h>
+#include <stdio.h>
 
 /* Private local functions */
 static void handle_pwd(struct vsf_session* p_sess);
@@ -1028,6 +1029,114 @@ handle_stor(struct vsf_session* p_sess)
   handle_upload_common(p_sess, 0, 0);
 }
 
+/* Based on __gen_tempname() from glibc - thanks, glibc! Relicensed
+ * from LGPL2.1+ to GPL2.
+ */
+static int
+create_unique_file(struct vsf_session* p_sess, struct mystr* p_outstr,
+                   const struct mystr* p_base_str,
+                   int (*access_checker)(const struct mystr*))
+{
+  struct mystr s_result = INIT_MYSTR;
+  const int suffix_len = 6;
+  unsigned int count;
+  static unsigned long long int value;
+  unsigned long long int random_time_bits;
+  int fd = -1;
+  /* These are the characters used in temporary file names.  */
+  struct mystr s_letters = INIT_MYSTR;
+  unsigned int s_letters_len;
+  int base_len;
+
+  str_alloc_text(&s_letters,
+      "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789");
+  s_letters_len = str_getlen(&s_letters);
+
+  /* A lower bound on the number of temporary files to attempt to
+     generate.  The maximum total number of temporary file names that
+     can exist for a given template is 62**6.  It should never be
+     necessary to try all of these combinations.  Instead if a reasonable
+     number of names is tried (we define reasonable as 62**3) fail to
+     give the system administrator the chance to remove the problems.  */
+#define ATTEMPTS_MIN (62 * 62 * 62)
+
+  /* The number of times to attempt to generate a temporary file. */
+#if ATTEMPTS_MIN < TMP_MAX
+  unsigned int attempts = TMP_MAX;
+#else
+  unsigned int attempts = ATTEMPTS_MIN;
+#endif
+#undef ATTEMPTS_MIN
+
+  {
+    long sec = vsf_sysutil_get_time_sec();
+    long usec = vsf_sysutil_get_time_usec();
+    random_time_bits = ((unsigned long long int) usec << 16) ^ sec;
+    value += random_time_bits ^ vsf_sysutil_getpid();
+  }
+
+  if (str_isempty(p_base_str))
+  {
+    const char *base = "STOU.";
+    base_len = vsf_sysutil_strlen(base);
+    str_reserve(&s_result, base_len + suffix_len);
+    str_alloc_text(&s_result, base);
+  }
+  else
+  {
+    str_reserve(&s_result, str_getlen(p_base_str) + suffix_len + 1);
+    str_copy(&s_result, p_base_str);
+    str_append_char(&s_result, '.');
+    base_len = str_getlen(&s_result);
+  }
+
+  for (count = 0; count < attempts; value += 7777, ++count)
+  {
+    unsigned long long v = value;
+    str_trunc(&s_result, base_len);
+    for (int i = 0; i < suffix_len; ++i)
+    {
+      char c;
+      c = str_get_char_at(&s_letters, v % s_letters_len);
+      v /= s_letters_len;
+      str_append_char(&s_result, c);
+    }
+    if (!access_checker(&s_result))
+    {
+      /* If we generate a filename which is not allowed, we fail immediatelly,
+       * without trying any other possibilities. This is to prevent attackers
+       * from keeping us busy.
+       */
+      vsf_cmdio_write(p_sess, FTP_NOPERM, "Permission denied.");
+      break;
+    }
+    fd = str_create_exclusive(&s_result);
+    if (vsf_sysutil_retval_is_error(fd))
+    {
+      if (kVSFSysUtilErrEXIST == vsf_sysutil_get_error())
+      {
+        continue;
+      }
+      else
+      {
+        vsf_cmdio_write(p_sess, FTP_UPLOADFAIL, "Could not create file.");
+        break;
+      }
+    }
+    else
+    {
+      break;
+    }
+  }
+  if (!vsf_sysutil_retval_is_error(fd))
+  {
+    str_copy(p_outstr, &s_result);
+  }
+  str_free(&s_letters);
+  str_free(&s_result);
+  return fd;
+}
+
 static void
 handle_upload_common(struct vsf_session* p_sess, int is_append, int is_unique)
 {
@@ -1049,41 +1158,56 @@ handle_upload_common(struct vsf_session* p_sess, int is_append, int is_unique)
     return;
   }
   resolve_tilde(&p_sess->ftp_arg_str, p_sess);
-  p_filename = &p_sess->ftp_arg_str;
-  if (is_unique)
-  {
-    get_unique_filename(&s_filename, p_filename);
-    p_filename = &s_filename;
-  }
   vsf_log_start_entry(p_sess, kVSFLogEntryUpload);
   str_copy(&p_sess->log_str, &p_sess->ftp_arg_str);
   prepend_path_to_filename(&p_sess->log_str);
-  if (!vsf_access_check_file(p_filename))
+  p_filename = &p_sess->ftp_arg_str;
+  if (is_unique && tunable_better_stou)
   {
-    vsf_cmdio_write(p_sess, FTP_NOPERM, "Permission denied.");
-    return;
-  }
-  /* NOTE - actual file permissions will be governed by the tunable umask */
-  /* XXX - do we care about race between create and chown() of anonymous
-   * upload?
-   */
-  if (is_unique || (p_sess->is_anonymous && !tunable_anon_other_write_enable))
-  {
-    new_file_fd = str_create_exclusive(p_filename);
+    new_file_fd = create_unique_file(p_sess, &s_filename, p_filename,
+                                     vsf_access_check_file);
+    if (vsf_sysutil_retval_is_error(new_file_fd))
+    {
+      return;
+    }
+    p_filename = &s_filename;
   }
   else
   {
-    /* For non-anonymous, allow open() to overwrite or append existing files */
-    new_file_fd = str_create(p_filename);
-    if (!is_append && offset == 0)
+    if (is_unique)
     {
-      do_truncate = 1;
+      get_unique_filename(&s_filename, p_filename);
+      p_filename = &s_filename;
     }
-  }
-  if (vsf_sysutil_retval_is_error(new_file_fd))
-  {
-    vsf_cmdio_write(p_sess, FTP_UPLOADFAIL, "Could not create file.");
-    return;
+    if (!vsf_access_check_file(p_filename))
+    {
+      vsf_cmdio_write(p_sess, FTP_NOPERM, "Permission denied.");
+      return;
+    }
+    /* NOTE - actual file permissions will be governed by the tunable umask */
+    /* XXX - do we care about race between create and chown() of anonymous
+     * upload?
+     */
+    if (is_unique || (p_sess->is_anonymous && !tunable_anon_other_write_enable))
+    {
+      new_file_fd = str_create_exclusive(p_filename);
+    }
+    else
+    {
+      /* For non-anonymous, allow open() to overwrite or append existing
+       * files
+       */
+      new_file_fd = str_create(p_filename);
+      if (!is_append && offset == 0)
+      {
+        do_truncate = 1;
+      }
+    }
+    if (vsf_sysutil_retval_is_error(new_file_fd))
+    {
+      vsf_cmdio_write(p_sess, FTP_UPLOADFAIL, "Could not create file.");
+      return;
+    }
   }
   created = 1;
   vsf_sysutil_fstat(new_file_fd, &s_p_statbuf);
