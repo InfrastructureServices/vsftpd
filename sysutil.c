@@ -2919,11 +2919,13 @@ vsf_sysutil_syslog(const char* p_text, int severe)
 }
 
 long
-vsf_sysutil_parse_time(const char* p_text)
+vsf_sysutil_parse_time(const char* p_text, int is_localtime)
 {
+  long res;
   struct tm the_time;
   unsigned int len = vsf_sysutil_strlen(p_text);
   vsf_sysutil_memclr(&the_time, sizeof(the_time));
+  the_time.tm_isdst = -1;
   if (len >= 8)
   {
     char yr[5];
@@ -2948,17 +2950,18 @@ vsf_sysutil_parse_time(const char* p_text)
     the_time.tm_min = vsf_sysutil_atoi(mins);
     the_time.tm_sec = vsf_sysutil_atoi(sec);
   }
-  return mktime(&the_time);
+  res = mktime(&the_time);
+  if (!is_localtime)
+  {
+    res += the_time.tm_gmtoff;
+  }
+  return res;
 }
 
 int
-vsf_sysutil_setmodtime(const char* p_file, long the_time, int is_localtime)
+vsf_sysutil_setmodtime(const char* p_file, long the_time)
 {
   struct utimbuf new_times;
-  if (!is_localtime)
-  {
-    the_time -= s_timezone;
-  }
   vsf_sysutil_memclr(&new_times, sizeof(new_times));
   new_times.actime = the_time;
   new_times.modtime = the_time;

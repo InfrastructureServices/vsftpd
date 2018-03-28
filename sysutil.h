@@ -354,9 +354,9 @@ void vsf_sysutil_chroot(const char* p_root_path);
  */
 long vsf_sysutil_get_time_sec(void);
 long vsf_sysutil_get_time_usec(void);
-long vsf_sysutil_parse_time(const char* p_text);
+long vsf_sysutil_parse_time(const char* p_text, int is_localtime);
 void vsf_sysutil_sleep(double seconds);
-int vsf_sysutil_setmodtime(const char* p_file, long the_time, int is_localtime);
+int vsf_sysutil_setmodtime(const char* p_file, long the_time);
 
 /* Limits */
 void vsf_sysutil_set_address_space_limit(unsigned long bytes);
