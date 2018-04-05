@@ -68,7 +68,12 @@ trick the C library into loading a user-created configuration file from the
 Default: NO
 .TP
 .B better_stou
-Use better file name generation algorithm for the STOU command.
+Use a better file name generation algorithm for the STOU command. The default
+original algorithm simply adds an increasing number suffix to the file name,
+which is prone to race conditions if multiple uploaders use the STOU command
+with the same file name simultaneously, which can result in failure of the
+command. The new algorithm adds a unique random six character suffix to
+the file name, which works much better in face of concurrent uploads.
 
 Default: NO
 .TP
