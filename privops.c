@@ -383,7 +383,8 @@ handle_local_login(struct vsf_session* p_sess,
                    struct mystr* p_user_str,
                    const struct mystr* p_pass_str)
 {
-  if (!vsf_sysdep_check_auth(p_user_str, p_pass_str, &p_sess->remote_ip_str))
+  if (!vsf_sysdep_check_auth(p_sess, p_user_str, p_pass_str,
+                             &p_sess->remote_ip_str))
   {
     return kVSFLoginFail;
   }

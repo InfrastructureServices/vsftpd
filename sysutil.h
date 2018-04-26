@@ -7,6 +7,8 @@
 #include "filesize.h"
 #endif
 
+#include "str.h"
+
 /* Return value queries */
 int vsf_sysutil_retval_is_error(int retval);
 enum EVSFSysUtilError
@@ -266,6 +268,8 @@ int vsf_sysutil_connect_timeout(int fd,
                                 unsigned int wait_seconds);
 void vsf_sysutil_dns_resolve(struct vsf_sysutil_sockaddr** p_sockptr,
                              const char* p_name);
+int vsf_sysutil_get_hostname(struct vsf_sysutil_sockaddr *p_addr,
+                             struct mystr* p_str);
 /* Option setting on sockets */
 void vsf_sysutil_activate_keepalive(int fd);
 void vsf_sysutil_rcvtimeo(int fd);

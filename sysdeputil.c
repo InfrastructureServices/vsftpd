@@ -16,10 +16,6 @@
 #include "tunables.h"
 #include "builddefs.h"
 
-/* For gethostbyaddr, inet_addr */
-#include <netdb.h>
-#include <arpa/inet.h>
-
 /* For Linux, this adds nothing :-) */
 #include "port/porting_junk.h"
 
@@ -242,13 +238,15 @@ void vsf_remove_uwtmp(void);
 
 #ifndef VSF_SYSDEP_HAVE_PAM
 int
-vsf_sysdep_check_auth(struct mystr* p_user_str,
+vsf_sysdep_check_auth(struct vsf_session* p_sess,
+                      struct mystr* p_user_str,
                       const struct mystr* p_pass_str,
                       const struct mystr* p_remote_host)
 {
   const char* p_crypted;
   const struct passwd* p_pwd = getpwnam(str_getbuf(p_user_str));
   (void) p_remote_host;
+  (void) p_sess;
   if (p_pwd == NULL)
   {
     return 0;
@@ -322,14 +320,14 @@ static int pam_conv_func(int nmsg, const struct pam_message** p_msg,
 static void vsf_auth_shutdown(void);
 
 int
-vsf_sysdep_check_auth(struct mystr* p_user_str,
+vsf_sysdep_check_auth(struct vsf_session* p_sess,
+                      struct mystr* p_user_str,
                       const struct mystr* p_pass_str,
                       const struct mystr* p_remote_host)
 {
   int retval = -1;
 #ifdef PAM_RHOST
-  struct sockaddr_in sin;
-  struct hostent *host;
+  struct mystr hostname = INIT_MYSTR;
 #endif
   pam_item_t item;
   const char* pam_user_name = 0;
@@ -354,13 +352,17 @@ vsf_sysdep_check_auth(struct mystr* p_user_str,
     return 0;
   }
 #ifdef PAM_RHOST
-  if (tunable_reverse_lookup_enable) {
-    sin.sin_addr.s_addr = inet_addr(str_getbuf(p_remote_host));
-    host = gethostbyaddr((char*)&sin.sin_addr.s_addr,sizeof(struct in_addr),AF_INET);
-    if (host != (struct hostent*)0)
-      retval = pam_set_item(s_pamh, PAM_RHOST, host->h_name);
+  if (tunable_reverse_lookup_enable)
+  {
+    if (vsf_sysutil_get_hostname(p_sess->p_remote_addr, &hostname) == 0)
+    {
+      retval = pam_set_item(s_pamh, PAM_RHOST, str_getbuf(&hostname));
+      str_free(&hostname);
+    }
     else
+    {
       retval = pam_set_item(s_pamh, PAM_RHOST, str_getbuf(p_remote_host));
+    }
   } else {
     retval = pam_set_item(s_pamh, PAM_RHOST, str_getbuf(p_remote_host));
   }

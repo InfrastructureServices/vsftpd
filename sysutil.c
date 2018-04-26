@@ -2356,6 +2356,41 @@ vsf_sysutil_dns_resolve(struct vsf_sysutil_sockaddr** p_sockptr,
   }
 }
 
+int
+vsf_sysutil_get_hostname(struct vsf_sysutil_sockaddr *p_addr,
+                         struct mystr* p_str)
+{
+  struct sockaddr *sa;
+  socklen_t sa_len = 0;
+  char hostname[NI_MAXHOST];
+  int res;
+
+  sa = &p_addr->u.u_sockaddr;
+  if (sa->sa_family == AF_INET)
+  {
+    sa_len = sizeof(struct sockaddr_in);
+  }
+  else if (sa->sa_family == AF_INET6)
+  {
+    sa_len = sizeof(struct sockaddr_in6);
+  }
+  else
+  {
+    die("can only support ipv4 and ipv6 currently");
+  }
+  res = getnameinfo(sa, sa_len, hostname, sizeof(hostname), NULL, 0,
+                    NI_NAMEREQD);
+  if (res == 0)
+  {
+    str_alloc_text(p_str, hostname);
+    return 0;
+  }
+  else
+  {
+    return -1;
+  }
+}
+
 struct vsf_sysutil_user*
 vsf_sysutil_getpwuid(const unsigned int uid)
 {
