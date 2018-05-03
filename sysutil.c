@@ -2588,6 +2588,11 @@ vsf_sysutil_chroot(const char* p_root_path)
   {
     die("chroot");
   }
+  retval = chdir("/");
+  if (retval != 0)
+  {
+    die("chdir");
+  }
 }
 
 unsigned int
