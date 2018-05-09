@@ -684,10 +684,15 @@ void
 vsf_sysutil_rcvtimeo(int fd)
 {
   struct timeval tv;
+  int retval;
 
   tv.tv_sec = tunable_data_connection_timeout;
   tv.tv_usec = 0;
-  setsockopt(fd, SOL_SOCKET, SO_RCVTIMEO, &tv, sizeof(struct timeval));
+  retval = setsockopt(fd, SOL_SOCKET, SO_RCVTIMEO, &tv, sizeof(struct timeval));
+  if (retval != 0)
+  {
+    die("setsockopt: rcvtimeo");
+  }
 }
 
 void
