@@ -2647,12 +2647,12 @@ error:
   die("reopening standard file descriptors to /dev/null failed");
 }
 
-char* vsf_sysutil_get_tz()
+char* vsf_sysutil_get_tz(void)
 {
   char *ret_tz = NULL;
   char buff[BUFTZSIZ];
   off_t s_pos, e_pos;
-  size_t rcnt, rest;
+  ssize_t rcnt, rest;
   int fd;
 
   if ((fd = open(F_LOCALTIME, O_RDONLY)) > -1)
@@ -2663,8 +2663,12 @@ char* vsf_sysutil_get_tz()
       return NULL;
     }
     s_pos = e_pos > BUFTZSIZ ? e_pos - BUFTZSIZ : 0;
-    lseek(fd, s_pos, SEEK_SET);
-    rcnt = read(fd, buff, BUFTZSIZ);
+    if (lseek(fd, s_pos, SEEK_SET) == -1 ||
+        (rcnt = vsf_sysutil_read(fd, buff, BUFTZSIZ)) == -1)
+    {
+      close(fd);
+      return NULL;
+    }
 
     if (rcnt && buff[rcnt-1] == '\n')
     {
@@ -2680,10 +2684,25 @@ char* vsf_sysutil_get_tz()
          int len = e_pos - s_pos - offset;
          if (len)
          {
-           lseek(fd, s_pos + offset, SEEK_SET);
+           if (lseek(fd, s_pos + offset, SEEK_SET) == -1)
+           {
+             close(fd);
+             return NULL;
+           }
            ret_tz = calloc(1, len+4);
+           if (ret_tz == NULL)
+           {
+             close(fd);
+             return NULL;
+           }
            memcpy(ret_tz, "TZ=", 3);
-           rcnt = read(fd, ret_tz+3, len);
+           rcnt = vsf_sysutil_read(fd, ret_tz+3, len);
+           if (rcnt == -1)
+           {
+             free(ret_tz);
+             close(fd);
+             return NULL;
+           }
          }
          break;
        }
@@ -2693,11 +2712,20 @@ char* vsf_sysutil_get_tz()
        }
        rest = s_pos > BUFTZSIZ ? s_pos - BUFTZSIZ : 0;
        s_pos -= rest;
-       lseek(fd, s_pos, SEEK_SET);
-       rcnt = read(fd, buff, rest);
+       if (lseek(fd, s_pos, SEEK_SET) == -1)
+       {
+         close(fd);
+         return NULL;
+       }
+       rcnt = vsf_sysutil_read(fd, buff, rest);
+       if (rcnt == -1)
+       {
+         close(fd);
+         return NULL;
+       }
     } while (rcnt > 0);
 
-    close (fd);
+    (void) vsf_sysutil_close_errno(fd);
   }
 
   return ret_tz;
