@@ -96,6 +96,8 @@ extern int tunable_allow_writeable_chroot;    /* Allow misconfiguration */
 extern int tunable_better_stou;               /* Use better file name generation
                                                * algorithm for the STOU command
 					       */
+extern int tunable_log_die;                   /* Log calls to die(), die2()
+                                               * and bug() */
 
 /* Integer/numeric defines */
 extern unsigned int tunable_accept_timeout;

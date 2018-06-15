@@ -112,6 +112,7 @@ parseconf_bool_array[] =
   { "seccomp_sandbox", &tunable_seccomp_sandbox },
   { "allow_writeable_chroot", &tunable_allow_writeable_chroot },
   { "better_stou", &tunable_better_stou },
+  { "log_die", &tunable_log_die },
   { 0, 0 }
 };
 

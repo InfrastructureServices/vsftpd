@@ -27,15 +27,12 @@ int
 vsf_tcp_wrapper_ok(int remote_fd)
 {
   struct request_info req;
-  vsf_sysutil_openlog(0);
   request_init(&req, RQ_DAEMON, "vsftpd", RQ_FILE, remote_fd, 0);
   fromhost(&req);
   if (!hosts_access(&req))
   {
-    vsf_sysutil_closelog();
     return 0;
   }
-  vsf_sysutil_closelog();
   return 1;
 }
 

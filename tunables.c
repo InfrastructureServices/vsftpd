@@ -93,6 +93,7 @@ int tunable_http_enable;
 int tunable_seccomp_sandbox;
 int tunable_allow_writeable_chroot;
 int tunable_better_stou;
+int tunable_log_die;
 
 unsigned int tunable_accept_timeout;
 unsigned int tunable_connect_timeout;
@@ -241,6 +242,7 @@ tunables_load_defaults()
   tunable_seccomp_sandbox = 0;
   tunable_allow_writeable_chroot = 0;
   tunable_better_stou = 0;
+  tunable_log_die = 0;
 
   tunable_accept_timeout = 60;
   tunable_connect_timeout = 60;

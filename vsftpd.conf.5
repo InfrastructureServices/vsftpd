@@ -358,6 +358,16 @@ wanting to e.g. append a file.
 
 Default: YES
 .TP
+.B log_die
+Log an error to syslog when some error condition occurs and vsftpd decides
+to quit. Internally, the error messages given to the functions die(), die2()
+and bug() are passed to syslog. Currently this functionality requires waiting
+for a short amount of time (1 second is used) after logging the message and
+before exiting. This is a workaround for the following systemd bug:
+https://github.com/systemd/systemd/issues/2913
+
+Default: NO
+.TP
 .B log_ftp_protocol
 When enabled, all FTP requests and responses are logged, providing the option
 xferlog_std_format is not enabled. Useful for debugging.

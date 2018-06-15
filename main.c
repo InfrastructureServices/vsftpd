@@ -120,6 +120,10 @@ main(int argc, const char* argv[])
     }
     vsf_sysutil_free(p_statbuf);
   }
+  if (tunable_log_die || tunable_syslog_enable || tunable_tcp_wrappers)
+  {
+    vsf_sysutil_openlog(0);
+  }
   /* Resolve pasv_address if required */
   if (tunable_pasv_address && tunable_pasv_addr_resolve)
   {

@@ -30,10 +30,6 @@ static void vsf_log_do_log_to_file(int fd, struct mystr* p_str);
 void
 vsf_log_init(struct vsf_session* p_sess)
 {
-  if (tunable_syslog_enable || tunable_tcp_wrappers)
-  {
-    vsf_sysutil_openlog(0);
-  }
   if (!tunable_xferlog_enable && !tunable_dual_log_enable)
   {
     return;
@@ -389,3 +385,12 @@ vsf_log_do_log_vsftpd_format(struct vsf_session* p_sess, struct mystr* p_str,
   }
 }
 
+void
+vsf_log_die(const char* p_text)
+{
+  struct mystr log_str = INIT_MYSTR;
+
+  str_append_text(&log_str, "ERROR: ");
+  str_append_text(&log_str, p_text);
+  str_syslog(&log_str, 1);
+}

@@ -91,5 +91,7 @@ void vsf_log_line(struct vsf_session* p_sess, enum EVSFLogEntryType what,
 void vsf_log_failed_line(struct vsf_session* p_sess, enum EVSFLogEntryType what,
                   struct mystr* p_str);
 
+void vsf_log_die(const char* p_text);
+
 #endif /* VSF_LOGGING_H */
 
