@@ -183,7 +183,7 @@ vsf_privop_pasv_listen(struct vsf_session* p_sess)
   }
   if (!bind_retries)
   {
-    die("vsf_sysutil_bind");
+    die("vsf_sysutil_bind, maximum number of retries exceeded");
   }
   return the_port;
 }
