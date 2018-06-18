@@ -120,8 +120,8 @@ unsigned short
 vsf_privop_pasv_listen(struct vsf_session* p_sess)
 {
   static struct vsf_sysutil_sockaddr* s_p_sockaddr;
-  int bind_retries = 10;
-  unsigned short the_port;
+  int bind_retries = tunable_bind_retries + 1;
+  unsigned short the_port = 0;
   /* IPPORT_RESERVED */
   unsigned short min_port = 1024;
   unsigned short max_port = 65535;
@@ -131,6 +131,10 @@ vsf_privop_pasv_listen(struct vsf_session* p_sess)
     die("listed fd already active");
   }
 
+  if (bind_retries < 2)
+  {
+    bind_retries = 2;
+  }
   if (tunable_pasv_min_port > min_port && tunable_pasv_min_port <= max_port)
   {
     min_port = (unsigned short) tunable_pasv_min_port;

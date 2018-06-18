@@ -120,6 +120,7 @@ extern unsigned int tunable_delay_failed_login;
 extern unsigned int tunable_delay_successful_login;
 extern unsigned int tunable_max_login_fails;
 extern unsigned int tunable_chown_upload_mode;
+extern unsigned int tunable_bind_retries;
 
 /* String defines */
 extern const char* tunable_secure_chroot_dir;
