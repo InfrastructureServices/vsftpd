@@ -143,6 +143,7 @@ parseconf_uint_array[] =
   { "delay_successful_login", &tunable_delay_successful_login },
   { "max_login_fails", &tunable_max_login_fails },
   { "chown_upload_mode", &tunable_chown_upload_mode },
+  { "bind_retries", &tunable_bind_retries },
   { 0, 0 }
 };
 
