@@ -774,21 +774,48 @@ vsf_sysutil_deactivate_linger_failok(int fd)
   (void) setsockopt(fd, SOL_SOCKET, SO_LINGER, &the_linger, sizeof(the_linger));
 }
 
-void
-vsf_sysutil_activate_noblock(int fd)
+static int
+vsf_sysutil_activate_noblock_internal(int fd, int return_err)
 {
   int retval;
   int curr_flags = fcntl(fd, F_GETFL);
   if (vsf_sysutil_retval_is_error(curr_flags))
   {
-    die("fcntl");
+    if (return_err)
+    {
+      return -1;
+    }
+    else
+    {
+      die("fcntl");
+    }
   }
   curr_flags |= O_NONBLOCK;
   retval = fcntl(fd, F_SETFL, curr_flags);
   if (retval != 0)
   {
-    die("fcntl");
+    if (return_err)
+    {
+      return -1;
+    }
+    else
+    {
+      die("fcntl");
+    }
   }
+  return 0;
+}
+
+void
+vsf_sysutil_activate_noblock(int fd)
+{
+  (void) vsf_sysutil_activate_noblock_internal(fd, 0);
+}
+
+int
+vsf_sysutil_activate_noblock_no_die(int fd)
+{
+  return vsf_sysutil_activate_noblock_internal(fd, 1);
 }
 
 void

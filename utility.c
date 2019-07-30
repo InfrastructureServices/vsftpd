@@ -47,11 +47,13 @@ bug(const char* p_text)
   {
     vsf_log_die(p_text);
   }
-  vsf_sysutil_activate_noblock(VSFTP_COMMAND_FD);
-  (void) vsf_sysutil_write_loop(VSFTP_COMMAND_FD, "500 OOPS: ", 10);
-  (void) vsf_sysutil_write_loop(VSFTP_COMMAND_FD, p_text,
-                                vsf_sysutil_strlen(p_text));
-  (void) vsf_sysutil_write_loop(VSFTP_COMMAND_FD, "\r\n", 2);
+  if (vsf_sysutil_activate_noblock_no_die(VSFTP_COMMAND_FD) == 0)
+  {
+    (void) vsf_sysutil_write_loop(VSFTP_COMMAND_FD, "500 OOPS: ", 10);
+    (void) vsf_sysutil_write_loop(VSFTP_COMMAND_FD, p_text,
+				  vsf_sysutil_strlen(p_text));
+    (void) vsf_sysutil_write_loop(VSFTP_COMMAND_FD, "\r\n", 2);
+  }
   if (tunable_log_die)
   {
     /* Workaround for https://github.com/systemd/systemd/issues/2913 */

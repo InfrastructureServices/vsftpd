@@ -281,6 +281,7 @@ void vsf_sysutil_activate_oobinline(int fd);
 void vsf_sysutil_activate_linger(int fd);
 void vsf_sysutil_deactivate_linger_failok(int fd);
 void vsf_sysutil_activate_noblock(int fd);
+int vsf_sysutil_activate_noblock_no_die(int fd);
 void vsf_sysutil_deactivate_noblock(int fd);
 /* This does SHUT_RDWR */
 void vsf_sysutil_shutdown_failok(int fd);
