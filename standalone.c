@@ -152,15 +152,15 @@ vsf_standalone_main(void)
       vsf_sysutil_kill(vsf_sysutil_getppid(), kVSFSysUtilSigUSR1);
     }
   }
-  vsf_sysutil_close(0);
-  vsf_sysutil_close(1);
-  vsf_sysutil_close(2);
   retval = vsf_sysutil_listen(listen_sock, VSFTP_LISTEN_BACKLOG);
   if (vsf_sysutil_retval_is_error(retval))
   {
     die("could not listen");
   }
   vsf_sysutil_sockaddr_alloc(&p_accept_addr);
+  vsf_sysutil_close(0);
+  vsf_sysutil_close(1);
+  vsf_sysutil_close(2);
   while (1)
   {
     struct vsf_client_launch child_info;
