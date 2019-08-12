@@ -1203,7 +1203,7 @@ void
 vsf_insert_uwtmp(const struct mystr* p_user_str,
                  const struct mystr* p_host_str)
 {
-  int attempts;
+  struct utmpx* p_res;
 
   if (sizeof(s_utent.ut_line) < 16)
   {
@@ -1233,34 +1233,21 @@ vsf_insert_uwtmp(const struct mystr* p_user_str,
   vsf_sysutil_strcpy(s_utent.ut_host, str_getbuf(p_host_str),
                      sizeof(s_utent.ut_host));
   s_utent.ut_tv.tv_sec = vsf_sysutil_get_time_sec();
-  for (attempts = 2; attempts > 0; --attempts)
+  setutxent();
+  do
   {
-    struct utmpx* p_res;
-    setutxent();
     p_res = pututxline(&s_utent);
     /* For now we'll ignore errors other than EINTR and EAGAIN */
-    if (p_res != NULL || (errno != EINTR && errno != EAGAIN))
-    {
-      break;
-    }
-  }
-  if (attempts == 0)
-  {
-    /* This makes us skip pututxline() in vsf_remove_uwtmp() */
-    s_uwtmp_inserted = -1;
-  }
-  else
-  {
-    s_uwtmp_inserted = 1;
-    endutxent();
-  }
+  } while (p_res == NULL && (errno == EINTR || errno == EAGAIN));
+  s_uwtmp_inserted = 1;
+  endutxent();
   updwtmpx(WTMPX_FILE, &s_utent);
 }
 
 void
 vsf_remove_uwtmp(void)
 {
-  int attempts;
+  struct utmpx* p_res;
 
   if (!s_uwtmp_inserted)
   {
@@ -1270,27 +1257,13 @@ vsf_remove_uwtmp(void)
   vsf_sysutil_memclr(s_utent.ut_user, sizeof(s_utent.ut_user));
   vsf_sysutil_memclr(s_utent.ut_host, sizeof(s_utent.ut_host));
   s_utent.ut_tv.tv_sec = 0;
-  if (s_uwtmp_inserted == 1)
+  setutxent();
+  do
   {
-    for (attempts = 2; attempts > 0; --attempts)
-    {
-      struct utmpx* p_res;
-      setutxent();
-      p_res = pututxline(&s_utent);
-      /* For now we'll ignore errors other than EINTR and EAGAIN */
-      if (p_res != NULL || (errno != EINTR && errno != EAGAIN))
-      {
-        break;
-      }
-    }
-    if (attempts != 0)
-    {
-      endutxent();
-    }
-  }
-  /* Set s_uwtmp_inserted to 0 regardless of the result of
-   * pututxline() to make sure we won't run this function twice.
-   */
+    p_res = pututxline(&s_utent);
+    /* For now we'll ignore errors other than EINTR and EAGAIN */
+  } while (p_res == NULL && (errno == EINTR || errno == EAGAIN));
+  endutxent();
   s_uwtmp_inserted = 0;
   s_utent.ut_tv.tv_sec = vsf_sysutil_get_time_sec();
   updwtmpx(WTMPX_FILE, &s_utent);
