@@ -72,8 +72,6 @@ static struct timeval s_current_time;
 static int s_current_pid = -1;
 /* Exit function */
 static exitfunc_t s_exit_func;
-/* Difference in timezone from GMT in seconds */
-static long s_timezone;
 
 /* Our internal signal handling implementation details */
 static struct vsf_sysutil_sig_details
@@ -2761,7 +2759,6 @@ char* vsf_sysutil_get_tz(void)
 void
 vsf_sysutil_tzset(void)
 {
-  int retval;
   char *tz=NULL, tzbuf[sizeof("+HHMM!")];
   time_t the_time = time(NULL);
   struct tm* p_tm;
@@ -2781,17 +2778,9 @@ vsf_sysutil_tzset(void)
   {
     die("localtime");
   }
-  retval = strftime(tzbuf, sizeof(tzbuf), "%z", p_tm);
-  tzbuf[sizeof(tzbuf) - 1] = '\0';
-  if (retval == 5)
-  {
-    s_timezone = ((tzbuf[1] - '0') * 10 + (tzbuf[2] - '0')) * 60 * 60;
-    s_timezone += ((tzbuf[3] - '0') * 10 + (tzbuf[4] - '0')) * 60;
-    if (tzbuf[0] == '+')
-    {
-      s_timezone *= -1;
-    }
-  }
+  /* Not sure if the following call to strftime() has any desired side
+     effects, so I'm keeping it to be safe. */
+  (void) strftime(tzbuf, sizeof(tzbuf), "%z", p_tm);
   /* Call in to the time subsystem again now that TZ is set, trying to force
    * caching of the actual zoneinfo for the timezone.
    */
