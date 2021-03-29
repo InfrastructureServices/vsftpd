@@ -98,6 +98,9 @@ int str_contains_space(const struct mystr* p_str);
 int str_all_space(const struct mystr* p_str);
 int str_contains_unprintable(const struct mystr* p_str);
 void str_replace_unprintable(struct mystr* p_str, char new_char);
+void str_replace_unprintable_with_hex(struct mystr* p_str);
+void str_replace_positions_with_hex(struct mystr* p_str, const unsigned int* poss,
+                                    const unsigned int pos_count);
 int str_atoi(const struct mystr* p_str);
 filesize_t str_a_to_filesize_t(const struct mystr* p_str);
 unsigned int str_octal_to_uint(const struct mystr* p_str);
