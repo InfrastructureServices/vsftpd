@@ -99,6 +99,7 @@ int str_all_space(const struct mystr* p_str);
 int str_contains_unprintable(const struct mystr* p_str);
 void str_replace_unprintable(struct mystr* p_str, char new_char);
 void str_replace_unprintable_with_hex(struct mystr* p_str);
+void str_replace_unprintable_with_hex_wc(struct mystr* p_str);
 void str_replace_positions_with_hex(struct mystr* p_str, const unsigned int* poss,
                                     const unsigned int pos_count);
 int str_atoi(const struct mystr* p_str);

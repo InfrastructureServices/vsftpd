@@ -22,6 +22,8 @@
 
 #include <stdio.h>
 #include <string.h>
+#include <wchar.h>
+#include <wctype.h>
 
 /* File local functions */
 static void str_split_text_common(struct mystr* p_src, struct mystr* p_rhs,
@@ -741,6 +743,46 @@ str_replace_unprintable_with_hex(struct mystr* p_str)
     if (!vsf_sysutil_isprint(p_str->p_buf[i]))
     {
       ups[up_count++] = i;
+    }
+  }
+  str_replace_positions_with_hex(p_str, ups, up_count);
+  vsf_sysutil_free(ups);
+}
+
+void str_replace_unprintable_with_hex_wc(struct mystr* p_str)
+{
+  unsigned int ups_size = sizeof(unsigned int) * (p_str->len);
+  if (ups_size < p_str->len)
+  {
+    bug("string is to long");
+  }
+  unsigned int* ups = vsf_sysutil_malloc(ups_size);
+  unsigned int up_count = 0;
+
+  size_t current = 0;
+  wchar_t pwc;
+  mbstate_t ps;
+  memset(&ps, 0, sizeof(ps));
+  ssize_t len = 0;
+  while ((len = mbrtowc(&pwc, p_str->p_buf, p_str->len - current, &ps)) > 0)
+  {
+    if (!iswprint(pwc))
+    {
+      for (unsigned int i = 0; i < len; i++)
+      {
+        ups[up_count++] = current++;
+      }
+    }
+    else
+    {
+      current += len;
+    }
+  }
+  if (len < 0)
+  {
+    while (current < p_str->len)
+    {
+      ups[up_count++] = current++;
     }
   }
   str_replace_positions_with_hex(p_str, ups, up_count);

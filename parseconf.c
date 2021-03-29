@@ -113,6 +113,7 @@ parseconf_bool_array[] =
   { "allow_writeable_chroot", &tunable_allow_writeable_chroot },
   { "better_stou", &tunable_better_stou },
   { "log_die", &tunable_log_die },
+  { "wc_logs_enable", &tunable_wc_logs_enable },
   { 0, 0 }
 };
 
