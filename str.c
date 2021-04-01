@@ -734,7 +734,9 @@ str_replace_unprintable_with_hex(struct mystr* p_str)
   unsigned int ups_size = sizeof(unsigned int) * (p_str->len);
   if (ups_size < p_str->len)
   {
-    bug("string is to long");
+    str_replace_unprintable(p_str, '?');
+    str_append_text(p_str, ": BUG: string is too long");
+    bug(p_str->p_buf);
   }
   unsigned int* ups = vsf_sysutil_malloc(ups_size);
   unsigned int up_count = 0;
@@ -754,7 +756,9 @@ void str_replace_unprintable_with_hex_wc(struct mystr* p_str)
   unsigned int ups_size = sizeof(unsigned int) * (p_str->len);
   if (ups_size < p_str->len)
   {
-    bug("string is to long");
+    str_replace_unprintable(p_str, '?');
+    str_append_text(p_str, ": BUG: string is too long");
+    bug(p_str->p_buf);
   }
   unsigned int* ups = vsf_sysutil_malloc(ups_size);
   unsigned int up_count = 0;
