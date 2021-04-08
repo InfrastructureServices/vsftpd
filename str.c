@@ -772,7 +772,7 @@ void str_replace_unprintable_with_hex_wc(struct mystr* p_str)
   {
     if (!iswprint(pwc))
     {
-      for (unsigned int i = 0; i < len; i++)
+      for (int i = 0; i < len; i++)
       {
         ups[up_count++] = current++;
       }
