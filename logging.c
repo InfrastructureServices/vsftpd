@@ -171,7 +171,14 @@ vsf_log_do_log_to_file(int fd, struct mystr* p_str)
       return;
     }
   }
-  str_replace_unprintable(p_str, '?');
+  if (tunable_wc_logs_enable)
+  {
+    str_replace_unprintable_with_hex_wc(p_str);
+  }
+  else
+  {
+    str_replace_unprintable_with_hex(p_str);
+  }
   str_append_char(p_str, '\n');
   /* Ignore write failure; maybe the disk filled etc. */
   (void) str_write_loop(p_str, fd);

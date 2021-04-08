@@ -20,6 +20,11 @@
 #include "utility.h"
 #include "sysutil.h"
 
+#include <stdio.h>
+#include <string.h>
+#include <wchar.h>
+#include <wctype.h>
+
 /* File local functions */
 static void str_split_text_common(struct mystr* p_src, struct mystr* p_rhs,
                                   const char* p_text, int is_reverse);
@@ -721,6 +726,102 @@ str_replace_unprintable(struct mystr* p_str, char new_char)
       p_str->p_buf[i] = new_char;
     }
   }
+}
+
+void
+str_replace_unprintable_with_hex(struct mystr* p_str)
+{
+  unsigned int ups_size = sizeof(unsigned int) * (p_str->len);
+  if (ups_size < p_str->len)
+  {
+    str_replace_unprintable(p_str, '?');
+    str_append_text(p_str, ": BUG: string is too long");
+    bug(p_str->p_buf);
+  }
+  unsigned int* ups = vsf_sysutil_malloc(ups_size);
+  unsigned int up_count = 0;
+  for (unsigned int i=0; i < p_str->len; i++)
+  {
+    if (!vsf_sysutil_isprint(p_str->p_buf[i]))
+    {
+      ups[up_count++] = i;
+    }
+  }
+  str_replace_positions_with_hex(p_str, ups, up_count);
+  vsf_sysutil_free(ups);
+}
+
+void str_replace_unprintable_with_hex_wc(struct mystr* p_str)
+{
+  unsigned int ups_size = sizeof(unsigned int) * (p_str->len);
+  if (ups_size < p_str->len)
+  {
+    str_replace_unprintable(p_str, '?');
+    str_append_text(p_str, ": BUG: string is too long");
+    bug(p_str->p_buf);
+  }
+  unsigned int* ups = vsf_sysutil_malloc(ups_size);
+  unsigned int up_count = 0;
+
+  size_t current = 0;
+  wchar_t pwc;
+  mbstate_t ps;
+  memset(&ps, 0, sizeof(ps));
+  ssize_t len = 0;
+  while ((len = mbrtowc(&pwc, p_str->p_buf, p_str->len - current, &ps)) > 0)
+  {
+    if (!iswprint(pwc))
+    {
+      for (unsigned int i = 0; i < len; i++)
+      {
+        ups[up_count++] = current++;
+      }
+    }
+    else
+    {
+      current += len;
+    }
+  }
+  if (len < 0)
+  {
+    while (current < p_str->len)
+    {
+      ups[up_count++] = current++;
+    }
+  }
+  str_replace_positions_with_hex(p_str, ups, up_count);
+  vsf_sysutil_free(ups);
+}
+
+void
+str_replace_positions_with_hex(struct mystr* p_str, const unsigned int* poss, const unsigned int pos_count)
+{
+  if (pos_count == 0)
+    return;
+
+  struct mystr tmp_str = INIT_MYSTR;
+  str_reserve(&tmp_str, p_str->len + 3 * pos_count);
+  unsigned int current = 0;
+
+  for (unsigned int i=0; i < pos_count; i++)
+  {
+    unsigned int pos = poss[i];
+
+    if (current < pos)
+      private_str_append_memchunk(&tmp_str, p_str->p_buf + current, pos - current);
+
+    char hex_buf[5];
+    memset(hex_buf, 0, sizeof(hex_buf));
+    sprintf(hex_buf, "\\x%02X", (unsigned char) p_str->p_buf[pos]);
+    str_append_text(&tmp_str, hex_buf);
+    current = pos + 1;
+  }
+
+  if (current < p_str->len)
+    private_str_append_memchunk(&tmp_str, p_str->p_buf + current, p_str->len - current);
+
+  str_copy(p_str, &tmp_str);
+  str_free(&tmp_str);
 }
 
 void

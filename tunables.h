@@ -98,6 +98,7 @@ extern int tunable_better_stou;               /* Use better file name generation
 					       */
 extern int tunable_log_die;                   /* Log calls to die(), die2()
                                                * and bug() */
+extern int tunable_wc_logs_enable;            /* Allow non ASCII characters in logs */
 
 /* Integer/numeric defines */
 extern unsigned int tunable_accept_timeout;

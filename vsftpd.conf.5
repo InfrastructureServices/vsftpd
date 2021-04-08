@@ -735,6 +735,12 @@ If enabled, use CLONE_NEWPID and CLONE_NEWIPC to isolate processes to their
 ipc and pid namespaces. So separated processes can not interact with each other.
 
 Default: YES
+.TP
+.B wc_logs_enable
+If enabled, logs will be treated as wide-character strings and not just
+ASCII strings when filtering out non-printable characters.
+
+Default: NO
 
 .SH NUMERIC OPTIONS
 Below is a list of numeric options. A numeric option must be set to a non
