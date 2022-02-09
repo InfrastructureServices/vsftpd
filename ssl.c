@@ -41,6 +41,13 @@ static long bio_callback(
   BIO* p_bio, int oper, const char* p_arg, int argi, long argl, long retval);
 static int ssl_verify_callback(int verify_ok, X509_STORE_CTX* p_ctx);
 static DH *ssl_tmp_dh_callback(SSL *ssl, int is_export, int keylength);
+static int ssl_alpn_callback(SSL* p_ssl,
+                             const unsigned char** p_out,
+                             unsigned char* outlen,
+                             const unsigned char* p_in,
+                             unsigned int inlen,
+                             void* p_arg);
+static long ssl_sni_callback(SSL* p_ssl, int* p_al, void* p_arg);
 static int ssl_cert_digest(
   SSL* p_ssl, struct vsf_session* p_sess, struct mystr* p_str);
 static void maybe_log_shutdown_state(struct vsf_session* p_sess);
@@ -286,6 +293,12 @@ ssl_init(struct vsf_session* p_sess)
     }
     
     SSL_CTX_set_tmp_dh_callback(p_ctx, ssl_tmp_dh_callback);
+    /* Set up ALPN to check for FTP protocol intention of client. */
+    SSL_CTX_set_alpn_select_cb(p_ctx, ssl_alpn_callback, p_sess);
+    /* Set up SNI callback for an optional hostname check. */
+    SSL_CTX_set_tlsext_servername_callback(p_ctx, ssl_sni_callback);
+    SSL_CTX_set_tlsext_servername_arg(p_ctx, p_sess);
+
 
     if (tunable_ecdh_param_file)
     {
@@ -869,6 +882,132 @@ ssl_tmp_dh_callback(SSL *ssl, int is_export, int keylength)
   UNUSED(is_export);
   
   return DH_get_dh(keylength);
+}
+static int
+ssl_alpn_callback(SSL* p_ssl,
+                  const unsigned char** p_out,
+                  unsigned char* outlen,
+                  const unsigned char* p_in,
+                  unsigned int inlen,
+                  void* p_arg) {
+  unsigned int i;
+  struct vsf_session* p_sess = (struct vsf_session*) p_arg;
+  int is_ok = 0;
+
+  (void) p_ssl;
+
+  /* Initialize just in case. */
+  *p_out = p_in;
+  *outlen = 0;
+
+  for (i = 0; i < inlen; ++i) {
+    unsigned int left = (inlen - i);
+    if (left < 4) {
+      continue;
+    }
+    if (p_in[i] == 3 && p_in[i + 1] == 'f' && p_in[i + 2] == 't' &&
+        p_in[i + 3] == 'p')
+    {
+      is_ok = 1;
+      *p_out = &p_in[i + 1];
+      *outlen = 3;
+      break;
+    }
+  }
+
+  if (!is_ok)
+  {
+    str_alloc_text(&debug_str, "ALPN rejection");
+    vsf_log_line(p_sess, kVSFLogEntryDebug, &debug_str);
+  }
+  if (!is_ok || tunable_debug_ssl)
+  {
+    str_alloc_text(&debug_str, "ALPN data: ");
+    for (i = 0; i < inlen; ++i) {
+      str_append_char(&debug_str, p_in[i]);
+    }
+    vsf_log_line(p_sess, kVSFLogEntryDebug, &debug_str);
+  }
+
+  if (is_ok)
+  {
+    return SSL_TLSEXT_ERR_OK;
+  }
+  else
+  {
+    return SSL_TLSEXT_ERR_ALERT_FATAL;
+  }
+}
+
+static long
+ssl_sni_callback(SSL* p_ssl, int* p_al, void* p_arg)
+{
+  static struct mystr s_sni_expected_hostname;
+  static struct mystr s_sni_received_hostname;
+
+  int servername_type;
+  const char* p_sni_servername;
+  struct vsf_session* p_sess = (struct vsf_session*) p_arg;
+  int is_ok = 0;
+
+  (void) p_ssl;
+  (void) p_arg;
+
+  if (tunable_ssl_sni_hostname)
+  {
+    str_alloc_text(&s_sni_expected_hostname, tunable_ssl_sni_hostname);
+  }
+
+  /* The OpenSSL documentation says it is pre-initialized like this, but set
+   * it just in case.
+   */
+  *p_al = SSL_AD_UNRECOGNIZED_NAME;
+
+  servername_type = SSL_get_servername_type(p_ssl);
+  p_sni_servername = SSL_get_servername(p_ssl, TLSEXT_NAMETYPE_host_name);
+  if (p_sni_servername != NULL) {
+    str_alloc_text(&s_sni_received_hostname, p_sni_servername);
+  }
+
+  if (str_isempty(&s_sni_expected_hostname))
+  {
+    is_ok = 1;
+  }
+  else if (servername_type != TLSEXT_NAMETYPE_host_name)
+  {
+    /* Fail. */
+    str_alloc_text(&debug_str, "SNI bad type: ");
+    str_append_ulong(&debug_str, servername_type);
+    vsf_log_line(p_sess, kVSFLogEntryDebug, &debug_str);
+  }
+  else
+  {
+    if (!str_strcmp(&s_sni_expected_hostname, &s_sni_received_hostname))
+    {
+      is_ok = 1;
+    }
+    else
+    {
+      str_alloc_text(&debug_str, "SNI rejection");
+      vsf_log_line(p_sess, kVSFLogEntryDebug, &debug_str);
+    }
+  }
+
+  if (!is_ok || tunable_debug_ssl)
+  {
+    str_alloc_text(&debug_str, "SNI hostname: ");
+    str_append_str(&debug_str, &s_sni_received_hostname);
+    vsf_log_line(p_sess, kVSFLogEntryDebug, &debug_str);
+  }
+
+  if (is_ok)
+  {
+    return SSL_TLSEXT_ERR_OK;
+  }
+  else
+  {
+    return SSL_TLSEXT_ERR_ALERT_FATAL;
+  }
 }
 
 void

@@ -1128,6 +1128,12 @@ for further details.
 
 Default: PROFILE=SYSTEM
 .TP
+.B ssl_sni_hostname
+If set, SSL connections will be rejected unless the SNI hostname in the
+incoming handshakes matches this value.
+
+Default: (none)
+.TP
 .B user_config_dir
 This powerful option allows the override of any config option specified in
 the manual page, on a per-user basis. Usage is simple, and is best illustrated

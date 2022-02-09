@@ -188,6 +188,7 @@ parseconf_str_array[] =
   { "rsa_private_key_file", &tunable_rsa_private_key_file },
   { "dsa_private_key_file", &tunable_dsa_private_key_file },
   { "ca_certs_file", &tunable_ca_certs_file },
+  { "ssl_sni_hostname", &tunable_ssl_sni_hostname },
   { "cmds_denied", &tunable_cmds_denied },
   { 0, 0 }
 };
