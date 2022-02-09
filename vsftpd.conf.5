@@ -555,7 +555,7 @@ Default: YES
 Only applies if
 .BR ssl_enable
 is activated. If enabled, this option will permit SSL v2 protocol connections.
-TLS v1.2 connections are preferred.
+TLS v1.2 and TLS v1.3 connections are preferred.
 
 Default: NO
 .TP
@@ -563,7 +563,7 @@ Default: NO
 Only applies if
 .BR ssl_enable
 is activated. If enabled, this option will permit SSL v3 protocol connections.
-TLS v1.2 connections are preferred.
+TLS v1.2 and TLS v1.3 connections are preferred.
 
 Default: NO
 .TP
@@ -571,7 +571,7 @@ Default: NO
 Only applies if
 .BR ssl_enable
 is activated. If enabled, this option will permit TLS v1 protocol connections.
-TLS v1.2 connections are preferred.
+TLS v1.2 and TLS v1.3 connections are preferred.
 
 Default: NO
 .TP
@@ -579,7 +579,7 @@ Default: NO
 Only applies if
 .BR ssl_enable
 is activated. If enabled, this option will permit TLS v1.1 protocol connections.
-TLS v1.2 connections are preferred.
+TLS v1.2 and TLS v1.3 connections are preferred.
 
 Default: NO
 .TP
@@ -587,7 +587,15 @@ Default: NO
 Only applies if
 .BR ssl_enable
 is activated. If enabled, this option will permit TLS v1.2 protocol connections.
-TLS v1.2 connections are preferred.
+TLS v1.2 and TLS v1.3 connections are preferred.
+
+Default: YES
+.TP
+.B ssl_tlsv1_3
+Only applies if
+.BR ssl_enable
+is activated. If enabled, this option will permit TLS v1.3 protocol connections.
+TLS v1.2 and TLS v1.3 connections are preferred.
 
 Default: YES
 .TP

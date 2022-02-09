@@ -22,7 +22,7 @@ handle_feat(struct vsf_session* p_sess)
     {
       vsf_cmdio_write_raw(p_sess, " AUTH SSL\r\n");
     }
-    if (tunable_tlsv1 || tunable_tlsv1_1 || tunable_tlsv1_2)
+    if (tunable_tlsv1 || tunable_tlsv1_1 || tunable_tlsv1_2 || tunable_tlsv1_3)
     {
       vsf_cmdio_write_raw(p_sess, " AUTH TLS\r\n");
     }

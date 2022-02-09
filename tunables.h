@@ -69,6 +69,7 @@ extern int tunable_sslv3;                     /* Allow SSLv3 */
 extern int tunable_tlsv1;                     /* Allow TLSv1 */
 extern int tunable_tlsv1_1;                   /* Allow TLSv1.1 */
 extern int tunable_tlsv1_2;                   /* Allow TLSv1.2 */
+extern int tunable_tlsv1_3;                   /* Allow TLSv1.3 */
 extern int tunable_tilde_user_enable;         /* Support e.g. ~chris */
 extern int tunable_force_anon_logins_ssl;     /* Require anon logins use SSL */
 extern int tunable_force_anon_data_ssl;       /* Require anon data uses SSL */

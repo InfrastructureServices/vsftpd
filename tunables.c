@@ -68,6 +68,7 @@ int tunable_sslv3;
 int tunable_tlsv1;
 int tunable_tlsv1_1;
 int tunable_tlsv1_2;
+int tunable_tlsv1_3;
 int tunable_tilde_user_enable;
 int tunable_force_anon_logins_ssl;
 int tunable_force_anon_data_ssl;
@@ -218,8 +219,9 @@ tunables_load_defaults()
   tunable_sslv3 = 0;
   tunable_tlsv1 = 0;
   tunable_tlsv1_1 = 0;
-  /* Only TLSv1.2 is enabled by default */
+  /* Only TLSv1.2 and TLSv1.3 are enabled by default */
   tunable_tlsv1_2 = 1;
+  tunable_tlsv1_3 = 1;
   tunable_tilde_user_enable = 0;
   tunable_force_anon_logins_ssl = 0;
   tunable_force_anon_data_ssl = 0;

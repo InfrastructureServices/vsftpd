@@ -185,6 +185,10 @@ ssl_init(struct vsf_session* p_sess)
     {
       options |= SSL_OP_NO_TLSv1_2;
     }
+    if (!tunable_tlsv1_3)
+    {
+      options |= SSL_OP_NO_TLSv1_3;
+    }
     SSL_CTX_set_options(p_ctx, options);
     if (tunable_rsa_cert_file)
     {
