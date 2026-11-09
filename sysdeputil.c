@@ -299,6 +299,10 @@ vsf_sysdep_check_auth(struct vsf_session* p_sess,
   }
   #endif /* VSF_SYSDEP_HAVE_SHADOW */
   p_crypted = crypt(str_getbuf(p_pass_str), p_pwd->pw_passwd);
+  if (p_crypted == NULL)
+  {
+    return 0;
+  }
   if (!vsf_sysutil_strcmp(p_crypted, p_pwd->pw_passwd))
   {
     return 1;
